@@ -1,0 +1,46 @@
+{
+  "name": "extend-ajax",
+  "version": "0.0.1-beta1",
+  "description": "an AJAX request library",
+  "main": "src/index.js",
+  "scripts": {
+    "server": "node test/server/index.js",
+    "test": "karma start"
+  },
+  "author": "YuChenLi923<liyc_code@163.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/YuChenLi923/extend-ajax.git"
+  },
+  "keywords": [
+    "ajax",
+    "extend-ajax",
+    "ajax-extend",
+    "yc"
+  ],
+  "devDependencies": {
+    "body-parser": "^1.18.2",
+    "eslint": "^4.7.2",
+    "eslint-config-standard": "^10.2.1",
+    "eslint-plugin-import": "^2.7.0",
+    "eslint-plugin-node": "^5.1.1",
+    "eslint-plugin-promise": "^3.5.0",
+    "eslint-plugin-standard": "^3.0.1",
+    "express": "^4.16.2",
+    "html-webpack-plugin": "^2.30.1",
+    "jasmine-core": "^2.8.0",
+    "karma": "^1.7.1",
+    "karma-chrome-launcher": "^2.2.0",
+    "karma-coverage": "^1.1.1",
+    "karma-ie-launcher": "^1.0.0",
+    "karma-jasmine": "^1.1.0",
+    "karma-webpack": "^2.0.5",
+    "webpack": "^3.6.0",
+    "webpack-node-externals": "^1.6.0"
+  },
+  "bugs": {
+    "url": "https://github.com/YuChenLi923/extend-ajax/issues",
+    "email": "liyc_code@163.com"
+  }
+}
