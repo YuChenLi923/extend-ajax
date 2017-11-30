@@ -56,6 +56,7 @@ create one ajax object, but it can't send a request immediately, you need use aj
     - Content-Type /<string> you can set: 'text', 'json', 'form'(default), 'formData', 'html' and standard content-type value
     - Accept /<string> you can set: 'text', 'json', 'html' and standard Accept value
     - ...
+
 ### ajax.send(data)
 
 send the ajax request, if browser support Promise, it will return Promise.If not, it will return itself.
