@@ -55,7 +55,7 @@ create one ajax object, but it can't send a request immediately, you need use aj
     - Content-Type /<string> you can set: 'text', 'json', 'form'(default), 'formData', 'html' and standard content-type value
     - Accept /<string> you can set: 'text', 'json', 'html' and standard Accept value
     - ...
-  - convert /<function>  pre-treat response data received, the function have one argument:response data.if set it, it must return a data handled,or when success event happen,we can't get data from res.
+- convert /<function>  pre-treat response data received, the function have one argument:response data.if set it, it must return a data handled,or when success event happen,we can't get data from res.
 
 ### ajax.send(data)
 
