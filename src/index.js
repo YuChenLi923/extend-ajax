@@ -10,7 +10,6 @@
     file: 'multipart/form-data',
     text: 'text/plain',
     form: 'application/x-www-form-urlencoded',
-    formData: '',
     _default: 'application/x-www-form-urlencoded'
   };
   var _accepts = {
@@ -31,7 +30,43 @@
     charset: 'utf-8',
     host: '',
     cacheSize: 2,
-    cacheExp: 1000
+    cacheExp: 300
+  };
+  var _encodeMethods = {
+    'application/json': function(data) {
+      isType(data, 'object') && (data = JSON.stringify(data));
+      return data;
+    },
+    'text/plain': function (data) {
+      !isType(data, 'string') && (data = '');
+      return data;
+    },
+    'application/x-www-form-urlencoded': function (data) {
+      var temp = '';
+      if (isType(data, 'object')) {
+        forEach(data, function (value, key) {
+          temp += ('&' + key + '=' + encodeURI(value));
+        });
+      }
+      data = temp.substring(1);
+      return data;
+    },
+    'formData': function (data) {
+      if (isType(data, 'object') && support.XHR2) {
+        var temp = new FormData();
+        forEach(data, function (value, key) {
+          if (isType(value, 'FileList')) {
+            forEach(value, function (file) {
+              temp.append(key, file);
+            });
+          } else {
+            temp.append(key, value);
+          }
+        });
+        data = temp;
+      }
+      return data;
+    }
   };
   var _LargeCamelReg = /(^\w)|-(\w)/,
       _DataType = / (\w+)]/;
@@ -68,21 +103,26 @@
       });
     }
   }
-  function deepEqual(result, expect) {
-    var flag = true;
-    if (isType(result, 'object') && isType(expect, 'object') &&
-        getObjectLength(result) === getObjectLength(expect)) {
-      forEach(expect, function (value, key) {
-        if (result.hasOwnProperty(key) && expect.hasOwnProperty(key)) {
-          flag = deepEqual(result[key], expect[key]);
-        } else {
-          flag = false;
-        }
-      });
+  function getHashKey(obj) {
+    var temp,
+        keys = [];
+    if (isType(obj, 'object')) {
+      temp = {};
+    } else if (isType(obj, 'array')) {
+      temp = [];
     } else {
-      flag = (result === expect);
+      return '';
     }
-    return flag;
+    forEach(obj, function (value, key) {
+      if (isType(value, 'object')) {
+        temp[key] = getHashKey(value);
+      }
+      keys.push(key);
+    });
+    forEach(keys.sort(), function (key) {
+      temp[key] = obj[key];
+    });
+    return temp;
   }
   function getHeader(xhr) {
     var headerStr = xhr.getAllResponseHeaders(),
@@ -102,14 +142,20 @@
       obj[toLargeCamel(key)] = temp;
     }
   }
-  function setHeader(xhr, header, charset) {
-    for (var key in header) {
-      var value = header[key],
-          isContentType = key === 'Content-Type',
+  function toStandardHeader(header) {
+    forEach(header, function (value, key) {
+      var isContentType = key === 'Content-Type',
           isAccept = key === 'Accept';
-      isContentType && (value = _contentTypes[value] ? _contentTypes[value] : value);
-      xhr.setRequestHeader(toLargeCamel(key), value);
-    }
+      isContentType && (value = _contentTypes[value] || value);
+      isAccept && (value = _accepts[value] || value);
+      header[key] = value;
+    });
+  }
+  function setHeader(xhr, header, charset) {
+    forEach(header, function (value, key){
+      key === 'Content-Type' && (value += ';charset=' + charset);
+      (value === 'formData' && key === 'Content-Type') || (xhr.setRequestHeader(key, value));
+    });
   }
   function forEach(items, cb) {
     var i,
@@ -124,39 +170,20 @@
       }
     }
   }
-  function getObjectLength(obj) {
-    var len = 0;
-    forEach(obj, function () {
-      ++len;
-    });
-    return len;
-  }
   function isType(data, type) {
     var expectType = _DataType.exec(Object.prototype.toString.call(data))[1].toLowerCase();
     return type.toLowerCase() === expectType;
   }
-  function haveCache(caches, data, size) {
-    var result = false,
-        cacheIndex;
-    if (!caches || caches.length === 0) {
-      result = false;
-    } else {
-      forEach(caches, function (cache, index) {
-        !result && (result = deepEqual(data, cache.data));
-        result && (result = cache) && (cacheIndex = index);
-      });
-    }
-    if (result.time && result.exp + result.time < +new Date()) {
-      caches.splice(cacheIndex, 1);
+  function verifyCache(cache, size, key) {
+    var result = true;
+    if (cache && ((cache.exp + cache.time < +new Date()) || (ajax.cacheCurSize < size + 1))) {
+      delete ajax.cache[key];
       --ajax.cacheCurSize;
       result = false;
+    } else if (!cache) {
+      result = false;
     }
-    if (caches && ajax.cacheCurSize > size) {
-      caches.shift();
-      --ajax.cacheCurSize;
-      (cacheIndex === 0) && (result = false);
-    }
-    return (result && result.res) || result;
+    return result;
   }
   function getXhr() {
     if (typeof XMLHttpRequest === 'undefined') {
@@ -186,7 +213,6 @@
   function addXHRListener(xhr, options) {
     var timeout = options.timeout,
         cacheExp = options.cacheExp,
-        cacheSize = options.cacheSize,
         timer = null,
         _this = this;
     xhr.onreadystatechange = function (e) {
@@ -196,24 +222,20 @@
           convert = options.convert,
           res = {};
       if (readyState === 4) {
-        responseText = xhr.responseText
+        responseText = xhr.responseText;
         status = xhr.status;
         res.status = status;
         res.header = getHeader(xhr);
         timer && clearTimeout(timer);
         if ((status >= 200 && status < 300) || status === 304) {
           res.data = isType(convert, 'function') ? convert(responseText) : responseText;
-          var cache = ajax.cache[_this.url];
-          if (!cache) {
-            cache = ajax.cache[_this.url] = [];
-          }
-          if (!haveCache(cache, _this.data, cacheSize)) {
-            cache.push({
+          var cacheKey = _this.url + JSON.stringify(getHashKey(_this.data));
+          if (!ajax.cache[cacheKey]) {
+            ajax.cache[cacheKey] = {
               res: res,
-              data: _this.data,
-              exp: cacheExp,
+              exp: (+cacheExp) * 1000,
               time: +new Date()
-            });
+            };
             ++ajax.cacheCurSize;
           }
           _this.emit('success', res);
@@ -230,47 +252,7 @@
     };
   }
   function encodeData(data, contentType) {
-    var temp;
-    switch (contentType) {
-    case 'json':
-    case 'application/json':
-      isType(data, 'object') && (data = JSON.stringify(data));
-      break;
-    case 'text':
-    case 'text/plain':
-      !isType(data, 'string') && (data = '');
-      break;
-    case 'application/x-www-form-urlencoded':
-    case 'form':
-      temp = '';
-      if (isType(data, 'object')) {
-        forEach(data, function (value, key) {
-          temp += ('&' + key + '=' + encodeURI(value));
-        });
-      }
-      data = temp.substring(1);
-      break;
-    case 'formData':
-      if (isType(data, 'object') && support.XHR2) {
-        temp = new FormData();
-        forEach(data, function (value, key) {
-          if (isType(value, 'FileList')) {
-            forEach(value, function (file) {
-              // checkFile() 文件检测
-              temp.append(key, file);
-            });
-          } else {
-            temp.append(key, value);
-          }
-        });
-        data = temp;
-      }
-      break;
-    default:
-      data = '';
-      break;
-    }
-    return data;
+    return _encodeMethods[contentType] ? _encodeMethods[contentType](data) : '';
   }
   // ajax对象
   var ajax = function () {
@@ -286,6 +268,7 @@
           xhr = this.xhr = getXhr(),
           _this = this;
       setKeyToLargeCamel(options.header);
+      toStandardHeader(options.header);
       this.type = type || 'post';
       this.url = url || '';
       options = this.options = extend(ajax.options || _options, options, ['host']);
@@ -326,14 +309,16 @@
       }
       this.url = url;
       this.data = data;
-      var cacheData = haveCache(ajax.cache[url], data, cacheSize);
-      if (!cacheData) {
-        data = encodeData(data, options.header['Content-Type']);
-        xhr.open(type, isGet ? (url + data) : url, async);
+      var cacheKey = url + JSON.stringify(getHashKey(data)),
+          cacheData = ajax.cache[cacheKey];
+      console.log(cacheKey);
+      if (!verifyCache(cacheData, cacheSize, cacheKey)) {
+        data = isGet ? encodeData(data, _contentTypes['form']) : encodeData(data, options.header['Content-Type']);
+        xhr.open(type, isGet ? (url + '?' + data) : url, async);
         setHeader(xhr, options.header, options.charset);
         xhr.send(isGet ? null : data || '');
       } else {
-        this.emit('success', cacheData);
+        this.emit('success', cacheData.res);
       }
       return this.promise || this;
     },
@@ -351,7 +336,7 @@
       extend(this.options, options);
     },
     options: _options,
-    cacheCurSize: 0,
+    cacheCurSize: 2,
     cache: {}
   });
   _ajax.init.prototype = _ajax;

@@ -8,27 +8,29 @@ ajax.config({
   cacheSize: 0
 });
 describe('test request', function () {
-  it('post', (done) => {
+  it('post', function (done) {
     ajax('test/post', 'post', {
       header: {
         'Content-Type': 'json'
       }
     }).send({
       a: 1
-    }).then(({data}) => {
-      console.log(data);
+    }).then(function (res) {
+      console.log(res.data);
       done();
     });
   });
-  it('get', (done) => {
+  it('get', function (done) {
     ajax('test/get', 'get', {
       header: {
         'Content-Type': 'form'
       },
-      convert: (data) => {
+      convert: function (data) {
         return JSON.parse(data);
       }
-    }).send().then(({data}) => {
+    }).send({
+      test: 9999
+    }).then(function (res) {
       done();
     });
   });
@@ -41,7 +43,12 @@ describe('test cache', function () {
         'Accept': 'json'
       }
     }).send({
-      test: 123
+      a: 123,
+      b: 12,
+      c: {
+        a: 123,
+        b: 12
+      }
     }).then(function (res) {
       console.log(res);
     });
@@ -52,7 +59,12 @@ describe('test cache', function () {
           'Accept': 'json'
         }
       }).send({
-        test: 123
+        b: 12,
+        a: 123,
+        c: {
+          b: 123,
+          a: 12
+        }
       }).then(function (res) {
         done();
         console.log(res);
