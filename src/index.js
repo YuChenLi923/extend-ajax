@@ -311,7 +311,6 @@
       this.data = data;
       var cacheKey = url + JSON.stringify(getHashKey(data)),
           cacheData = ajax.cache[cacheKey];
-      console.log(cacheKey);
       if (!verifyCache(cacheData, cacheSize, cacheKey)) {
         data = isGet ? encodeData(data, _contentTypes['form']) : encodeData(data, options.header['Content-Type']);
         xhr.open(type, isGet ? (url + '?' + data) : url, async);
