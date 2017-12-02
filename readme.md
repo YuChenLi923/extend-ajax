@@ -54,7 +54,7 @@ create one ajax object, but it can't send a request immediately, you need use aj
 
   - host \<string> host url,default: {'Content-Type': 'form', 'Accept': 'json'}
   - cacheSize \<number> set size of cache, default: 0
-  - cacheExp <number> set the cache expiration time relative to the present, default: 300, unit: s.
+  - cacheExp \<number> set the cache expiration time relative to the present, default: 300, unit: s.
   - charset \<stirng> set http charset,default: 'utf-8'
   - convert \<function>  pre-treat response data received, the function have one argument:response data.if set it, it must return a data handled,or when success event happen,we can't get data from res.
   - header \<object> set http header.default: {'Content-Type': 'form', 'Accept': 'json'}
