@@ -52,7 +52,7 @@ create one ajax object, but it can't send a request immediately, you need use aj
 
   - async \<boolean> default: true
 
-  - host \<string> host url,default: {'Content-Type': 'form', 'Accept': 'json'}
+  - host \<string> host url,default: ''.
   - cacheSize \<number> set size of cache, default: 0
   - cacheExp \<number> set the cache expiration time relative to the present, default: 300, unit: s.
   - charset \<stirng> set http charset,default: 'utf-8'
