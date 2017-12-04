@@ -1,7 +1,7 @@
 # extend-ajax
 [![Travis](https://img.shields.io/travis/rust-lang/rust.svg)]()
-[![Github All Releases](https://img.shields.io/github/downloads/lyc923/extend-ajax/total.svg)]()
-
+![NPM version](https://badge.fury.io/js/extend-ajax.svg)
+![Downloads](http://img.shields.io/npm/dm/extend-ajax.svg?style=flat)
 
 - returns Promises（if support it）
 - ability to specify request headers

@@ -5,7 +5,7 @@ ajax.config({
   convert: function (data) {
     return JSON.parse(data);
   },
-  cacheSize: 0
+  cacheSize: 5
 });
 describe('test request', function () {
   it('post', function (done) {
@@ -46,8 +46,8 @@ describe('test cache', function () {
       a: 123,
       b: 12,
       c: {
-        a: 123,
-        b: 12
+        a: 12,
+        b: 123
       }
     }).then(function (res) {
       console.log(res);

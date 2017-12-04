@@ -104,25 +104,25 @@
     }
   }
   function getHashKey(obj) {
-    var temp,
-        keys = [];
-    if (isType(obj, 'object')) {
-      temp = {};
-    } else if (isType(obj, 'array')) {
-      temp = [];
-    } else {
-      return '';
-    }
-    forEach(obj, function (value, key) {
-      if (isType(value, 'object')) {
-        temp[key] = getHashKey(value);
+    var array = [],
+        hash = '';
+    (function getKeys(array, obj, preKey) {
+      var key;
+      for (key in obj) {
+        if (isType(obj[key], 'object') || isType(obj[key], 'array')) {
+          getKeys(array, obj[key], key + '.');
+        } else {
+          array.push({key: preKey + key, value: obj[key]});
+        }
       }
-      keys.push(key);
+    })(array, obj, '');
+    array.sort(function (item1, item2) {
+      return item1.key > item2.key;
     });
-    forEach(keys.sort(), function (key) {
-      temp[key] = obj[key];
+    forEach(array, function (item) {
+      hash += item.key + '=' + item.value + ';';
     });
-    return temp;
+    return hash;
   }
   function getHeader(xhr) {
     var headerStr = xhr.getAllResponseHeaders(),
@@ -176,7 +176,7 @@
   }
   function verifyCache(cache, size, key) {
     var result = true;
-    if (cache && ((cache.exp + cache.time < +new Date()) || (ajax.cacheCurSize < size + 1))) {
+    if (cache && ((cache.exp + cache.time < +new Date()) || (ajax.cacheCurSize > size))) {
       delete ajax.cache[key];
       --ajax.cacheCurSize;
       result = false;
@@ -229,14 +229,16 @@
         timer && clearTimeout(timer);
         if ((status >= 200 && status < 300) || status === 304) {
           res.data = isType(convert, 'function') ? convert(responseText) : responseText;
-          var cacheKey = _this.url + JSON.stringify(getHashKey(_this.data));
-          if (!ajax.cache[cacheKey]) {
-            ajax.cache[cacheKey] = {
-              res: res,
-              exp: (+cacheExp) * 1000,
-              time: +new Date()
-            };
-            ++ajax.cacheCurSize;
+          if (options.cacheSize) {
+            var cacheKey = _this.url + JSON.stringify(getHashKey(_this.data));
+            if (!ajax.cache[cacheKey]) {
+              ajax.cache[cacheKey] = {
+                res: res,
+                exp: (+cacheExp) * 1000,
+                time: +new Date()
+              };
+              ++ajax.cacheCurSize;
+            }
           }
           _this.emit('success', res);
         } else {
@@ -309,9 +311,11 @@
       }
       this.url = url;
       this.data = data;
-      var cacheKey = url + JSON.stringify(getHashKey(data)),
-          cacheData = ajax.cache[cacheKey];
-      if (!verifyCache(cacheData, cacheSize, cacheKey)) {
+      if (cacheSize) {
+        var cacheKey = url + JSON.stringify(getHashKey(data)),
+            cacheData = ajax.cache[cacheKey];
+      }
+      if (!cacheSize || !verifyCache(cacheData, cacheSize, cacheKey)) {
         data = isGet ? encodeData(data, _contentTypes['form']) : encodeData(data, options.header['Content-Type']);
         xhr.open(type, isGet ? (url + '?' + data) : url, async);
         setHeader(xhr, options.header, options.charset);
