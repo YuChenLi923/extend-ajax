@@ -1,5 +1,5 @@
 # extend-ajax
-[![Travis](https://img.shields.io/travis/rust-lang/rust.svg)]()
+
 ![NPM version](https://badge.fury.io/js/extend-ajax.svg)
 ![Downloads](http://img.shields.io/npm/dm/extend-ajax.svg?style=flat)
 
