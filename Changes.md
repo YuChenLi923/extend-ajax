@@ -1,5 +1,10 @@
 # Changes
 
+# 0.0.4
+
+- Add:support AMD
+
+
 # 0.0.3
 
 - Modify: improve 40% performance of cache than previous version.

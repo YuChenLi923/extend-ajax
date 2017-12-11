@@ -1,4 +1,8 @@
-(function (win) {
+(function (global, factory) {
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+    typeof define === 'function' && define.amd ? define(factory) : global.ejax = factory();
+})(this, function () {
+  var win = window;
   var support = {
     XHR2: !!win.FormData,
     Promise: !!win.Promise,
@@ -162,11 +166,11 @@
         len;
     if (isType(items, 'array') || items.length) {
       for (i = 0, len = items.length; i < len; i++) {
-        cb(items[i], i);
+        cb(items[i], i) && (i = len);
       }
     } else if (isType(items, 'object')) {
       for (i in items) {
-        cb(items[i], i);
+        if (cb(items[i], i)) { break; }
       }
     }
   }
@@ -186,20 +190,19 @@
     return result;
   }
   function getXhr() {
-    if (typeof XMLHttpRequest === 'undefined') {
-      try {
-        return new ActiveXObject('Msxml2.XMLHTTP.6.0');
-      } catch (e) {}
-      try {
-        return new ActiveXObject('Msxml2.XMLHTTP.3.0');
-      } catch (e) {}
-      try {
-        return new ActiveXObject('Msxml2.XMLHTTP');
-      } catch (e) {}
-      return false;
-    } else {
-      return new XMLHttpRequest();
+    var activeXs = ['Msxml2.XMLHTTP.6.0', 'Msxml2.XMLHTTP.3.0', 'Msxml2.XMLHTTP'],
+        xhr;
+    try {
+      xhr = new XMLHttpRequest();
+    } catch (e) {
+      forEach(activeXs, function (activeX) {
+        try {
+          xhr = new ActiveXObject(activeX);
+          return xhr;
+        } catch (e) {}
+      });
     }
+    return xhr;
   }
   function addXHR2Listener(xhr) {
     var callback = ['error', 'abort', 'progress'],
@@ -344,9 +347,6 @@
   });
   _ajax.init.prototype = _ajax;
   protect(_ajax, ['emit']);
-  if (typeof module === 'object' && module.exports) {
-    module.exports = ajax;
-  } else if (win.window === win) {
-    win.ajax = ajax;
-  }
-})(window);
+  return ajax;
+});
+
