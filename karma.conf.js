@@ -46,7 +46,7 @@ module.exports = function (config) {
     logLevel: config.LOG_INFO,
     autoWatch: !isTravis,
     singleRun: isTravis,
-    browsers: isTravis ? ['Chrome'] : ['Chrome', 'IE', 'Firefox', 'Opera'],
+    browsers: isTravis ? ['Chrome', 'Firefox'] : ['Chrome', 'IE', 'Firefox', 'Opera'],
     customDebugFile: 'test/debug.html',
     customContextFile: 'test/context.html',
     customHeaders: [{
