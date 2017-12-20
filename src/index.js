@@ -3,6 +3,7 @@
     typeof define === 'function' && define.amd ? define(factory) : global.ejax = factory();
 })(this, function () {
   var win = window;
+  var doc = document;
   var support = {
     XHR2: !!win.FormData,
     Promise: !!win.Promise,
@@ -72,8 +73,8 @@
       return data;
     }
   };
-  var _LargeCamelReg = /(^\w)|-(\w)/,
-      _DataType = / (\w+)]/;
+  var _LargeCamelReg = /(^\w)|-(\w)/;
+  var _DataType = / (\w+)]/;
   function extend(target, source, filter) {
     var key,
         flag;
@@ -229,9 +230,9 @@
         status = xhr.status;
         res.status = status;
         res.header = getHeader(xhr);
+        res.data = isType(convert, 'function') ? convert(responseText) : responseText;
         timer && clearTimeout(timer);
         if ((status >= 200 && status < 300) || status === 304) {
-          res.data = isType(convert, 'function') ? convert(responseText) : responseText;
           if (options.cacheSize) {
             var cacheKey = _this.url + JSON.stringify(getHashKey(_this.data));
             if (!ajax.cache[cacheKey]) {
@@ -251,10 +252,60 @@
       } else if (readyState === 1 && isType(timeout, 'number')) {
         timer = setTimeout(function () {
           res.error = new Error('request timeout');
-          _this.emit('timeout', res);
+          _this.emit('timeout');
         }, timeout);
       }
     };
+  }
+  function addFormListener(form, options) {
+    var id = +new Date(),
+        iframe = doc.createElement('frame'),
+        res = {},
+        convert = options.convert,
+        timeout = options.timeout,
+        timer = null,
+        _this = this,
+        initLoad = true,
+         submit = form.submit;
+    iframe.name = form.target = id;
+    iframe.style.cssText = 'display:none';
+    doc.body.appendChild(iframe);
+    res.status = null;
+    res.header = null;
+    var load = function () {
+      clearTimeout(timer);
+      if (!initLoad) {
+        var responseText = iframe.contentWindow.document.body.innerText;
+        res.data = isType(convert, 'function') ? convert(responseText) : responseText;
+        _this.emit('success', res);
+      }
+    };
+    var createTimer = function (e) {
+      initLoad = false;
+      if (timeout) {
+        clearTimeout(timer);
+        timer = setTimeout(function () {
+          try {
+            iframe.removeEventListener('load', load);
+          } catch (e) {
+            iframe.detachEvent('load', load);
+          }
+          _this.emit('timeout');
+        }, timeout);
+      }
+      return false;
+    };
+    form.submit = function () {
+      submit.call(form);
+      createTimer();
+    };
+    try {
+      iframe.addEventListener('load', load);
+      form.addEventListener('submit', createTimer);
+    } catch (e) {
+      iframe.attachEvent('load', load);
+      form.attachEvent('submit', createTimer);
+    }
   }
   function encodeData(data, contentType) {
     return _encodeMethods[contentType] ? _encodeMethods[contentType](data) : '';
@@ -267,25 +318,34 @@
   // 初始化ajax对象， 内部使用
   extend(_ajax, {
     init: function Ajax(args) {
-      var url = args.shift(),
-          type = args[0],
-          options = args[1],
+      var url = args.shift() || '',
+          type = typeof args[0] === 'string' ? (args[0] || 'post') : 'post',
+          options = args[1] ? (args[1] || {}) : args[0],
           xhr = this.xhr = getXhr(),
-          _this = this;
-      setKeyToLargeCamel(options.header);
-      toStandardHeader(options.header);
-      this.type = type || 'post';
-      this.url = url || '';
+          _this = this,
+          formElement = typeof url === 'object' ? url : null;
+      formElement && (url = null);
+      options.header && (setKeyToLargeCamel(options.header) || toStandardHeader(options.header));
+      this.type = type;
+      this.url = url;
+      this.formElement = formElement;
       options = this.options = extend(ajax.options || _options, options, ['host']);
-      support.XHR2 && addXHR2Listener.call(this, xhr, options);
+      !formElement && support.XHR2 && addXHR2Listener.call(this, xhr, options);
+      var addListener = function () {
+        if (formElement) {
+          addFormListener.call(_this, formElement, options);
+        } else {
+          addXHRListener.call(_this, xhr, options);
+        }
+      };
       if (support.Promise) {
         this.promise = new Promise(function (resolve) {
-          addXHRListener.call(_this, xhr, options);
+          addListener();
           _this.resolve = resolve;
         });
         protect(this, ['promise', 'resolve']);
       } else {
-        addXHRListener.call(_this, xhr, options);
+        addListener();
       }
     },
     on: function (event, cb) {
@@ -299,12 +359,16 @@
       isType(cb, 'function') && this.on('success', cb);
     },
     send: function (data) {
+      if (this.formElement) {
+        return;
+      }
       var xhr = this.xhr,
           type = this.type,
           url = this.url,
           options = this.options,
           async = options.async,
           cacheSize = options.cacheSize,
+          query = options.query,
           rootHost = ajax.options.host,
           isGet = type === 'get';
       if (isType(rootHost, 'object') && isType(this.host, 'string')) {
@@ -319,10 +383,11 @@
             cacheData = ajax.cache[cacheKey];
       }
       if (!cacheSize || !verifyCache(cacheData, cacheSize, cacheKey)) {
+        query && (query = encodeData(query, _contentTypes['form'])) && (url += '?' + query);
         data = isGet ? encodeData(data, _contentTypes['form']) : encodeData(data, options.header['Content-Type']);
-        xhr.open(type, isGet ? (url + '?' + data) : url, async);
+        xhr.open(type, url, async);
         setHeader(xhr, options.header, options.charset);
-        xhr.send(isGet ? null : data || '');
+        xhr.send(data);
       } else {
         this.emit('success', cacheData.res);
       }
@@ -343,10 +408,18 @@
     },
     options: _options,
     cacheCurSize: 2,
-    cache: {}
+    cache: {},
+    form: function (id, options) {
+      var formElement = doc.getElementById(id);
+      if (!formElement) {
+        throw new Error('Html element selected is null');
+      } else if (!formElement.nodeName.toLowerCase() === 'form') {
+        throw new Error('Html element selected must be form element');
+      }
+      return ajax(formElement, null, options);
+    }
   });
   _ajax.init.prototype = _ajax;
   protect(_ajax, ['emit']);
   return ajax;
 });
-

@@ -1,7 +1,6 @@
 var ajax = require('extend-ajax');
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000000;
 ajax.config({
-  host: 'http://localhost:8081/',
   convert: function (data) {
     return JSON.parse(data);
   },
@@ -70,5 +69,36 @@ describe('test cache', function () {
         console.log(res);
       });
     }, 1000);
+  });
+});
+describe('test form submit', function () {
+  it('test form submit', function (done) {
+    var form = document.getElementById('my-form');
+    form.elements[0].value = 'test';
+    ajax.form('my-form', {
+      convert: function (data) {
+        return JSON.parse(data);
+      }
+    }).on('success', function (res) {
+      console.log(res, 99999);
+      done();
+    });
+    form.submit();
+  });
+  it('test form submit timeout', function (done) {
+    var formTimeOut = document.getElementById('my-form-timeout');
+    formTimeOut.elements[0].value = 'test';
+    ajax.form('my-form-timeout', {
+      convert: function (data) {
+        return data;
+      },
+      timeout: 5
+    }).on('success', function (res) {
+      console.log(res);
+    }).on('timeout', function () {
+      done();
+      console.log('request timeout');
+    });
+    formTimeOut.submit();
   });
 });
