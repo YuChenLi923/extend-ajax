@@ -1,6 +1,6 @@
 language: node_js
 addons:
-  chrome: stable,
+  chrome: stable
   firefox: latest
 install:
  - npm install
