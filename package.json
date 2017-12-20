@@ -4,8 +4,9 @@
   "description": "an AJAX request library",
   "main": "src/index.js",
   "scripts": {
-    "server": "node test/server/index.js",
-    "test": "karma start"
+    "test": "karma start",
+    "lint": "eslint src",
+    "build": "set TRAVIS=true && npm run lint && npm run test"
   },
   "author": "YuChenLi923<liyc_code@163.com>",
   "license": "MIT",

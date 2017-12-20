@@ -2,8 +2,8 @@ var webpackConfig = require('./build/webpack.test.config'),
     customSever = require('./test/server/index'),
     bodyParser = function () {
       return require('body-parser')();
-    };
-
+    },
+    isTravis = process.env.TRAVIS || false;
 module.exports = function (config) {
   config.set({
     // base path that will be used to resolve all patterns (eg. files, exclude)
@@ -36,17 +36,17 @@ module.exports = function (config) {
       {'middleware:custom-server': ['factory', customSever]}
     ],
     middleware: ['body-parser', 'custom-server'],
-    reporters: ['progress', 'coverage', 'coveralls'],
+    reporters: ['coverage', 'coveralls'],
     coverageReporter: {
       type: 'lcov',
-      dir: 'coverage/'
+      dir: 'coverage'
     },
     port: 9876,
     colors: true,
     logLevel: config.LOG_INFO,
-    autoWatch: true,
+    autoWatch: !isTravis,
+    singleRun: isTravis,
     browsers: ['Chrome', 'IE', 'Firefox'],
-    singleRun: false,
     customDebugFile: 'test/debug.html',
     customContextFile: 'test/context.html',
     customHeaders: [{

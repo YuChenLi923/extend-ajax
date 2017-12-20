@@ -1,6 +1,5 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
-    typeof define === 'function' && define.amd ? define(factory) : global.ejax = factory();
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() : typeof define === 'function' && define.amd ? define(factory) : global.ejax = factory();
 })(this, function () {
   var win = window;
   var doc = document;
@@ -38,7 +37,7 @@
     cacheExp: 300
   };
   var _encodeMethods = {
-    'application/json': function(data) {
+    'application/json': function (data) {
       isType(data, 'object') && (data = JSON.stringify(data));
       return data;
     },
@@ -157,7 +156,7 @@
     });
   }
   function setHeader(xhr, header, charset) {
-    forEach(header, function (value, key){
+    forEach(header, function (value, key) {
       key === 'Content-Type' && (value += ';charset=' + charset);
       (value === 'formData' && key === 'Content-Type') || (xhr.setRequestHeader(key, value));
     });
@@ -266,7 +265,7 @@
         timer = null,
         _this = this,
         initLoad = true,
-         submit = form.submit;
+        submit = form.submit;
     iframe.name = form.target = id;
     iframe.style.cssText = 'display:none';
     doc.body.appendChild(iframe);
