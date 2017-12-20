@@ -1,4 +1,7 @@
 language: node_js
+addons:
+  chrome: stable,
+   firefox: latest
 install:
  - npm install
 node_js:
