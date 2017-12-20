@@ -2,7 +2,7 @@
 
 ![NPM version](https://badge.fury.io/js/extend-ajax.svg)
 ![Downloads](http://img.shields.io/npm/dm/extend-ajax.svg?style=flat)
-[![Coverage Status](https://coveralls.io/repos/github/YuChenLi923/yc-task-manager/badge.svg?branch=master)](https://coveralls.io/github/YuChenLi923/extend-ajax?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/YuChenLi923/extend-ajax/badge.svg?branch=master)](https://coveralls.io/github/YuChenLi923/extend-ajax?branch=master)
 - returns Promises（if support it）
 - ability to specify request headers
 - ability to get response headers
