@@ -34,7 +34,9 @@
     charset: 'utf-8',
     host: '',
     cacheSize: 2,
-    cacheExp: 300
+    cacheExp: 300,
+    jsonpName: 'jsonpCallback',
+    jsonpParam: 'callback'
   };
   var _encodeMethods = {
     'application/json': function (data) {
@@ -205,7 +207,7 @@
     return xhr;
   }
   function addXHR2Listener(xhr) {
-    var callback = ['error', 'abort', 'progress'],
+    var callback = ['abort', 'progress'],
         _this = this;
     forEach(callback, function (event) {
       xhr['on' + event] = function (e) {
@@ -253,6 +255,56 @@
           res.error = new Error('request timeout');
           _this.emit('timeout');
         }, timeout);
+      }
+    };
+  }
+  function createScript(url) {
+    var script = doc.createElement('script'),
+        _this = this,
+        timeout = this.options.timeout,
+        timer = null,
+        body = doc.body;
+    this.script = script;
+    script.src = url;
+    script.type = 'text/javascript';
+    if (timeout) {
+      timer = setTimeout(function () {
+        timer = script.onreadystatechange = script.onload = script.onerror = null;
+        _this.jsonpTimeout = true;
+        body.removeChild(script);
+        _this.emit('timeout');
+      }, timeout);
+    }
+    body.appendChild(script);
+    function load() {
+      if (!script.getAttribute('data-load')) {
+        _this.emit('fail');
+        script.onerror = null;
+        body.removeChild(script);
+      }
+      script.onload = script.onreadystatechange = null;
+      clearTimeout(timer);
+      win[_this.options.jsonpName] = null;
+    }
+    script.onreadystatechange = function () {
+      if (script.readyState && (script.readyState === 'loaded' || script.readyState === 'complete')) {
+        load();
+      }
+    };
+    script.onload = load;
+    script.onerror = function () {
+      clearTimeout(timer);
+      _this.emit('fail');
+      win[_this.options.jsonpName] = null;
+      body.removeChild(script);
+    };
+  }
+  function addJSONPCallback(cb) {
+    var _this = this;
+    win[this.options.jsonpName] = function () {
+      _this.script.setAttribute('data-load', true);
+      if (!_this.jsonpTimeout) {
+        cb.apply(null, arguments);
       }
     };
   }
@@ -320,7 +372,7 @@
       var url = args.shift() || '',
           type = typeof args[0] === 'string' ? (args[0] || 'post') : 'post',
           options = args[1] ? (args[1] || {}) : args[0],
-          xhr = this.xhr = getXhr(),
+          xhr = this.xhr = type === 'jsonp' ? null : getXhr(),
           _this = this,
           formElement = typeof url === 'object' ? url : null;
       formElement && (url = null);
@@ -329,11 +381,13 @@
       this.url = url;
       this.formElement = formElement;
       options = this.options = extend(ajax.options || _options, options, ['host']);
-      !formElement && support.XHR2 && addXHR2Listener.call(this, xhr, options);
+      if (!formElement && support.XHR2 && xhr) {
+        addXHR2Listener.call(this, xhr, options);
+      }
       var addListener = function () {
         if (formElement) {
           addFormListener.call(_this, formElement, options);
-        } else {
+        } else if (xhr) {
           addXHRListener.call(_this, xhr, options);
         }
       };
@@ -349,13 +403,21 @@
     },
     on: function (event, cb) {
       if (isType(cb, 'function')) {
-        this['$' + event] = cb;
-        protect(this, ['$' + event]);
+        if (event === 'success' && !this.xhr) {
+          addJSONPCallback.call(this, cb);
+        } else {
+          this['$' + event] = cb;
+          protect(this, ['$' + event]);
+        }
       }
       return this;
     },
     then: function (cb) {
-      isType(cb, 'function') && this.on('success', cb);
+      if (this.xhr) {
+        isType(cb, 'function') && this.on('success', cb);
+      } else {
+        throw new Error('extend-ajax can\'t use then() with jsonp, it must use on(\'sucesss\')');
+      }
     },
     send: function (data) {
       if (this.formElement) {
@@ -375,22 +437,27 @@
       } else if (isType(rootHost, 'string')) {
         url = rootHost + url;
       }
-      this.url = url;
       this.data = data;
-      if (cacheSize) {
-        var cacheKey = url + JSON.stringify(getHashKey(data)),
-            cacheData = ajax.cache[cacheKey];
-      }
-      if (!cacheSize || !verifyCache(cacheData, cacheSize, cacheKey)) {
-        query && (query = encodeData(query, _contentTypes['form'])) && (url += '?' + query);
-        data = isGet ? encodeData(data, _contentTypes['form']) : encodeData(data, options.header['Content-Type']);
-        xhr.open(type, url, async);
-        setHeader(xhr, options.header, options.charset);
-        xhr.send(data);
+      if (xhr) {
+        if (cacheSize) {
+          var cacheKey = url + JSON.stringify(getHashKey(data)),
+              cacheData = ajax.cache[cacheKey];
+        }
+        if (!cacheSize || !verifyCache(cacheData, cacheSize, cacheKey)) {
+          query && (query = encodeData(query, _contentTypes['form'])) && (url += '?' + query);
+          data = isGet ? encodeData(data, _contentTypes['form']) : encodeData(data, options.header['Content-Type']);
+          xhr.open(type, url, async);
+          setHeader(xhr, options.header, options.charset);
+          xhr.send(data);
+        } else {
+          this.emit('success', cacheData.res);
+        }
       } else {
-        this.emit('success', cacheData.res);
+        // jsonp
+        url += '?' + options.jsonpParam + '=' + options.jsonpName;
+        createScript.call(this, url);
       }
-      return this.promise || this;
+      return xhr ? (this.promise || this) : this;
     },
     emit: function () {
       var args = toArray(arguments),

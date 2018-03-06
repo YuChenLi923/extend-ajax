@@ -6,19 +6,12 @@ var webpackConfig = require('./build/webpack.test.config'),
     isTravis = process.env.TRAVIS || false;
 module.exports = function (config) {
   config.set({
-    // base path that will be used to resolve all patterns (eg. files, exclude)
     basePath: '',
-    // frameworks to use
-    // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
     frameworks: ['jasmine'],
-    // list of files / patterns to load in the browser
     files: [
       'test/index.js'
     ],
-    // list of files to exclude
     exclude: [],
-    // preprocess matching files before serving them to the browser
-    // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
       'test/index.js': ['webpack', 'coverage'],
       '*.js': ['coverage']
@@ -46,7 +39,7 @@ module.exports = function (config) {
     logLevel: config.LOG_INFO,
     autoWatch: !isTravis,
     singleRun: isTravis,
-    browsers: isTravis ? ['Firefox'] : ['Chrome', 'IE', 'Firefox', 'Opera'],
+    browsers: isTravis ? ['Firefox'] : ['Chrome', 'IE', 'Firefox'],
     customDebugFile: 'test/debug.html',
     customContextFile: 'test/context.html',
     customHeaders: [{
@@ -56,8 +49,8 @@ module.exports = function (config) {
     }],
     concurrency: Infinity,
     webpack: webpackConfig,
-    webpackMiddleware:{
+    webpackMiddleware: {
       noInfo: false
     }
-  })
+  });
 };

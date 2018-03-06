@@ -2,6 +2,7 @@ var ajax = require('extend-ajax');
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000000;
 ajax.config({
   convert: function (data) {
+    console.log(data, 9999);
     return JSON.parse(data);
   },
   cacheSize: 5
@@ -31,6 +32,19 @@ describe('test request', function () {
       test: 9999
     }).then(function (res) {
       done();
+    });
+  });
+  it('fail', function (done) {
+    var myAjax = ajax('test/fail', 'post');
+    myAjax.on('fail', function () {
+      console.log('request fail');
+      done();
+    });
+    myAjax.on('success', function () {
+      done();
+    });
+    myAjax.send({
+      test: 9999
     });
   });
 });
@@ -69,6 +83,46 @@ describe('test cache', function () {
         console.log(res);
       });
     }, 1000);
+  });
+});
+describe('test jsonp', function () {
+  it('jsonp success', function (done) {
+    var testJSONP = ajax('/test/jsonp', 'jsonp', {
+      jsonpParam: 'callback',
+      jsonpName: 'getDataByJsonp'
+    });
+    testJSONP.on('success', function (data) {
+      console.log('get data:' + data + ' with jsonp');
+      done();
+    });
+    testJSONP.send();
+  });
+  it('jsonp fail', function (done) {
+    var testJSONP = ajax('/test/jsonpfail', 'jsonp', {
+      jsonpParam: 'callback',
+      jsonpName: 'getDataByJsonp'
+    });
+    testJSONP.on('fail', function (data) {
+      console.log('jsonp fail');
+      done();
+    });
+    testJSONP.send();
+  });
+  it('jsonp timeout', function (done) {
+    var testJSONP = ajax('/test/jsonp-timout', 'jsonp', {
+      jsonpParam: 'callback',
+      jsonpName: 'getDataByJsonp',
+      timeout: 1
+    });
+    testJSONP.on('timeout', function (data) {
+      console.log('jsonp timeout');
+      done();
+    });
+    testJSONP.on('success', function (data) {
+      console.log('get data:' + data + ' with jsonp');
+      done();
+    });
+    testJSONP.send();
   });
 });
 describe('test form submit', function () {

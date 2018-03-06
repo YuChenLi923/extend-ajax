@@ -7,8 +7,9 @@
 - returns Promises（if support it）
 - ability to specify request headers
 - ability to get response headers
-- cache response data
+- if it isn't jsonp,it can cache response data
 - pre-treat response received
+- support jsonp
 - support IE8+
 
 ## Install
@@ -19,7 +20,17 @@ npm i extend-ajax --save
 
 ## Examples
 
-send a post request
+send a simple post request
+
+```
+ajax('test/post', 'post').send({
+   text: 'hello'
+}).then(({data})=> {
+  console.log(data);
+})
+```
+
+send a post request and specify global options
 
 ```
 var ajax = require('extend-ajax');
@@ -86,6 +97,19 @@ myForm.on('timeout', ({data}) => {
 
 ```
 
+jsonp
+
+```
+ var JSONP = ajax('/test/jsonp', 'jsonp', {
+     jsonpParam: 'callback',
+     jsonpName: 'getDataByJsonp'
+ });
+ JSONP.on('success', function (data) {
+     console.log('get data:' + data + ' with jsonp');
+     done();
+ });
+ JSONP.send();
+```
 
 ## API
 
@@ -95,18 +119,19 @@ create one ajax object, but it can't send a request immediately, you need use aj
 
 - url \<string> a reequest url
 
-- method \<string> request method。default: 'post'
+- method \<string> request method。default: 'post'.
 
 - options \<object>
 
   - async \<boolean> default: true
-
   - host \<string> host url,default: ''.
   - timeout \<number> the number of milliseconds a request can take before automatically being terminated
   - cacheSize \<number> set size of cache, default: 0
   - cacheExp \<number> set the cache expiration time relative to the present, default: 300, unit: s.
   - charset \<stirng> set http charset,default: 'utf-8'
   - convert \<function>  pre-treat response data received, the function have one argument:response data.if set it, it must return a data handled,or when success event happen,we can't get data from res.
+  - jsonpName \<String> name of the callback functions that handle jsonp response,default: 'jsonpCallback'
+  - jsonpParma \<String> name of the query string parameter to specify the callback,default: 'callback'
   - header \<object> set http header.default: {'Content-Type': 'form', 'Accept': 'json'}
     - Content-Type \<string> you can set: 'text', 'json', 'form'(default), 'formData', 'html' and standard content-type value
     - Accept \<string> you can set: 'text', 'json', 'html' and standard Accept value
@@ -123,13 +148,13 @@ return ajax object, but it can't send any ajax request. It only be used to liste
 
 ### ajax.send(data)
 
-send the ajax request, if browser support Promise, it will return Promise.If not, it will return itself.
+send the ajax request, if browser support Promise, it will return Promise.If not or jsonp, it will return itself.
 
 - data \<string>|\<object>  if the request method is 'get', it's appended to query string of the URL, or it's sended to remote of body.
 
 ### ajax.then(cb)
 
-when browser can't support Promise,ajax.send() will return the ajax object, so you can use then() to get response.
+when browser can't support Promise,ajax.send() will return the ajax object, so you can use ajax.then() to get response.But if type is 'jsonp',ajax.then() will don't work.
 
 - cb \<function> the function have one argument res object include header, status, data.
 
@@ -139,10 +164,9 @@ add event listener for the ajax object.if async is false, ajax.on() must be call
 - cb \<funtction>  the cb is called when event happen
 - event \<string>
   - success  cb is fired when getting the response successfully
-  - fail  cb is fired when  failing to get the response(eg: 404, 400, 500...)
+  - fail  cb is fired when  failing to get the response(eg:http status: 404, 400, 500..., or jsonp fail)
   - abort  cb is fired when request is aborted
   - timeout  cb is fired when request timeout
-  - error  cb is fired when happening error
 
 ### ajax.config(options)
 

@@ -1,7 +1,12 @@
 # Changes
+# 1.0.0
+
+- Add: jsonp
+- remove: the 'error' event
+
 # 0.1.0
 
-- Add:new method: ajax.form
+- Add a new method: ajax.form
 - Add: when the request failed, res still have res data.
 - Fix: when the way of request is not post and get, it happen error
 - Fix: when ajax(url, options) is called, options will be considered as request method
