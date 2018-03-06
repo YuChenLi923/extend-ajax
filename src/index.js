@@ -351,7 +351,7 @@
       createTimer();
     };
     try {
-      iframe.addEventListener('load', load);
+      iframe.onload = load;
       form.addEventListener('submit', createTimer);
     } catch (e) {
       iframe.attachEvent('load', load);

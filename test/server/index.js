@@ -47,7 +47,7 @@ app.post('/test/form', (req, res) => {
         message: 'xxxxx',
         send: body
       };
-  res.setHeader('Content-Type', ' application/json');
+  res.setHeader('Content-Type', 'text/html');
   res.write(JSON.stringify(result));
   res.end();
 });
@@ -58,7 +58,7 @@ app.post('/test/form-timeout', (req, res) => {
         send: body
       };
   setTimeout(() => {
-    res.setHeader('Content-Type', ' application/json');
+    res.setHeader('Content-Type', 'text/html');
     res.write(JSON.stringify(result));
     res.end();
   }, 500);

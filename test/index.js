@@ -134,7 +134,7 @@ describe('test form submit', function () {
         return JSON.parse(data);
       }
     }).on('success', function (res) {
-      console.log(res, 99999);
+      console.log(res);
       done();
     });
     form.submit();
@@ -148,6 +148,7 @@ describe('test form submit', function () {
       },
       timeout: 5
     }).on('success', function (res) {
+      done();
       console.log(res);
     }).on('timeout', function () {
       done();
