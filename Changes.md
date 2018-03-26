@@ -1,5 +1,9 @@
 # Changes
 
+# 1.1.0
+
+- Add two new events: 'start'、'end'
+
 # 1.0.1
 
 - Add method: stop()

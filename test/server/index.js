@@ -18,6 +18,16 @@ app.post('/test/post', (req, res) => {
   res.write(JSON.stringify(result));
   res.end();
 });
+app.post('/test/start', (req, res) => {
+  let body = req.body,
+      result = {
+        message: 'xxxxx',
+        send: body
+     };
+  res.setHeader('Content-Type', ' application/json');
+  res.write(JSON.stringify(result));
+  res.end();
+});
 app.post('/test/fail', (req, res) => {
   let body = req.body,
       result = {

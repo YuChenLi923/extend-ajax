@@ -57,6 +57,34 @@ describe('test request', function () {
     });
     myAjax.stop();
   });
+  it('end', function (done) {
+    var myAjax = ajax('test/get', 'get', {
+      header: {
+        'Content-Type': 'form'
+      }
+    });
+    myAjax.on('end', function () {
+      console.log('request end');
+      done();
+    });
+    myAjax.send({
+      test: 9999
+    });
+  });
+  it('start', function (done) {
+    var myAjax = ajax('test/start', 'get', {
+      header: {
+        'Content-Type': 'form'
+      }
+    });
+    myAjax.on('start', function () {
+      console.log('start request');
+      done();
+    });
+    myAjax.send({
+      test: 9999
+    });
+  });
 });
 describe('test cache', function () {
   it('cache ajax', function (done) {

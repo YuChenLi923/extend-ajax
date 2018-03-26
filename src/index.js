@@ -250,11 +250,14 @@
           res.error = new Error('request fail:' + status);
           _this.emit('fail', res);
         }
-      } else if (readyState === 1 && isType(timeout, 'number')) {
-        timer = setTimeout(function () {
-          res.error = new Error('request timeout');
-          _this.emit('timeout');
-        }, timeout);
+      } else if (readyState === 1) {
+        _this.emit('start');
+        if (isType(timeout, 'number')) {
+          timer = setTimeout(function () {
+            res.error = new Error('request timeout');
+            _this.emit('timeout');
+          }, timeout);
+        }
       }
     };
   }
@@ -275,6 +278,7 @@
         _this.emit('timeout');
       }, timeout);
     }
+    _this.emit('start');
     body.appendChild(script);
     function load() {
       if (!script.getAttribute('data-load')) {
@@ -333,6 +337,7 @@
     };
     var createTimer = function (e) {
       initLoad = false;
+      _this.emit('start');
       if (timeout) {
         clearTimeout(timer);
         timer = setTimeout(function () {
@@ -469,6 +474,9 @@
         this.resolve(args[0]);
       }
       this['$' + event] && this['$' + event].apply(null, args);
+      if (event !== 'progress' && event !== 'end' && event !== 'start ') {
+        this.emit('end');
+      }
     }
   });
   extend(ajax, {

@@ -139,7 +139,7 @@ create one ajax object, but it can't send a request immediately, you need use aj
 
 ### ajax.form(id[,options])
 
-return ajax object, but it can't send any ajax request. It only be used to listen the data response submitted by the form.It only support 'success' and 'timeout' event.
+return ajax object, but it can't send any ajax request. It only be used to listen the data response submitted by the form.It only support 'success', 'end', 'start' and 'timeout' event.
 
 - id form html element's id
 - options  \<object>
@@ -171,6 +171,8 @@ add event listener for the ajax object.if async is false, ajax.on() must be call
   - fail  cb is fired when  failing to get the response(eg:http status: 404, 400, 500..., or jsonp fail)
   - abort  cb is fired when request is aborted
   - timeout  cb is fired when request timeout
+  - start cb is fired when start send the request
+  - end cb is fired when request is finished whether it's a success or a failure
 
 ### ajax.config(options)
 
