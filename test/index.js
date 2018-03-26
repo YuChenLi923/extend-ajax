@@ -2,8 +2,10 @@ var ajax = require('extend-ajax');
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000000;
 ajax.config({
   convert: function (data) {
-    console.log(data, 9999);
-    return JSON.parse(data);
+    return data;
+  },
+  header: {
+    a: 1231
   },
   cacheSize: 5
 });
@@ -24,9 +26,6 @@ describe('test request', function () {
     ajax('test/get', 'get', {
       header: {
         'Content-Type': 'form'
-      },
-      convert: function (data) {
-        return JSON.parse(data);
       }
     }).send({
       test: 9999
@@ -46,6 +45,17 @@ describe('test request', function () {
     myAjax.send({
       test: 9999
     });
+  });
+  it('abort', function (done) {
+    var myAjax = ajax('test/fail', 'post');
+    myAjax.on('abort', function () {
+      console.log('request abort');
+      done();
+    });
+    myAjax.send({
+      test: 9999
+    });
+    myAjax.stop();
   });
 });
 describe('test cache', function () {
@@ -129,11 +139,7 @@ describe('test form submit', function () {
   it('test form submit', function (done) {
     var form = document.getElementById('my-form');
     form.elements[0].value = 'test';
-    ajax.form('my-form', {
-      convert: function (data) {
-        return JSON.parse(data);
-      }
-    }).on('success', function (res) {
+    ajax.form('my-form').on('success', function (res) {
       console.log(res);
       done();
     });
@@ -143,9 +149,6 @@ describe('test form submit', function () {
     var formTimeOut = document.getElementById('my-form-timeout');
     formTimeOut.elements[0].value = 'test';
     ajax.form('my-form-timeout', {
-      convert: function (data) {
-        return data;
-      },
       timeout: 5
     }).on('success', function (res) {
       done();

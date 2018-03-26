@@ -1,4 +1,10 @@
 # Changes
+
+# 1.0.1
+
+- Add method: stop()
+- Fix: global config's header can't merge with instance's header.
+
 # 1.0.0
 
 - Add: jsonp

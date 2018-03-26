@@ -86,7 +86,7 @@
         filterKey === key && (flag = false);
       }));
       if (flag) {
-        target[key] = source[key];
+        target[key] = key === 'header' ? extend(target[key] || {}, source[key] || {}) : source[key];
       }
     }
     return target;
@@ -376,7 +376,7 @@
           _this = this,
           formElement = typeof url === 'object' ? url : null;
       formElement && (url = null);
-      options.header && (setKeyToLargeCamel(options.header) || toStandardHeader(options.header));
+      options && options.header && (setKeyToLargeCamel(options.header) || toStandardHeader(options.header));
       this.type = type;
       this.url = url;
       this.formElement = formElement;
@@ -411,6 +411,9 @@
         }
       }
       return this;
+    },
+    stop: function () {
+      typeof this.xhr.abort === 'function' && this.xhr.abort();
     },
     then: function (cb) {
       if (this.xhr) {
