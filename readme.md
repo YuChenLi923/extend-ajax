@@ -152,6 +152,10 @@ send the ajax request, if browser support Promise, it will return Promise.If not
 
 - data \<string>|\<object>  if the request method is 'get', it's appended to query string of the URL, or it's sended to remote of body.
 
+### ajax.stop()
+
+abort the ajax request
+
 ### ajax.then(cb)
 
 when browser can't support Promise,ajax.send() will return the ajax object, so you can use ajax.then() to get response.But if type is 'jsonp',ajax.then() will don't work.
