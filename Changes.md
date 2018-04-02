@@ -1,5 +1,10 @@
 # Changes
 
+# 1.1.1
+
+- Fix: global config's header can't be standardized.
+- Fix: instance's config can affect global config
+
 # 1.1.0
 
 - Add two new events: 'start'、'end'

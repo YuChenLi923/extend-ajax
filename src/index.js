@@ -33,7 +33,7 @@
     },
     charset: 'utf-8',
     host: '',
-    cacheSize: 2,
+    cacheSize: 0,
     cacheExp: 300,
     jsonpName: 'jsonpCallback',
     jsonpParam: 'callback'
@@ -90,6 +90,9 @@
       }
     }
     return target;
+  }
+  function cloneObject(obj) {
+    return JSON.parse(JSON.stringify(obj));
   }
   function toLargeCamel(str) {
     return str.replace(_LargeCamelReg, function (char) {
@@ -381,11 +384,11 @@
           _this = this,
           formElement = typeof url === 'object' ? url : null;
       formElement && (url = null);
-      options && options.header && (setKeyToLargeCamel(options.header) || toStandardHeader(options.header));
+      options && options.header && (setKeyToLargeCamel(options.header) && toStandardHeader(options.header));
       this.type = type;
       this.url = url;
       this.formElement = formElement;
-      options = this.options = extend(ajax.options || _options, options, ['host']);
+      options = this.options = extend(cloneObject(ajax.options || _options), options, ['host']);
       if (!formElement && support.XHR2 && xhr) {
         addXHR2Listener.call(this, xhr, options);
       }
@@ -481,7 +484,10 @@
   });
   extend(ajax, {
     config: function (options) {
-      extend(this.options, options);
+      if (typeof options === 'object') {
+        options.header && setKeyToLargeCamel(options.header) && toStandardHeader(options.header);
+        extend(this.options, options);
+      }
     },
     options: _options,
     cacheCurSize: 2,
