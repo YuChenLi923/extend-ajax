@@ -13,7 +13,7 @@ describe('test request', function () {
   it('post', function (done) {
     ajax('test/post', 'post', {
       header: {
-        'Content-Type': 'json'
+        'content-type': 'json'
       }
     }).send({
       a: 1

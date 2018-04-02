@@ -74,7 +74,7 @@
       return data;
     }
   };
-  var _LargeCamelReg = /(^\w)|-(\w)/;
+  var _LargeCamelReg = /^\w+(-\w+)+/;
   var _DataType = / (\w+)]/;
   function extend(target, source, filter) {
     var key,
@@ -92,12 +92,41 @@
     return target;
   }
   function cloneObject(obj) {
-    return JSON.parse(JSON.stringify(obj));
+    var source;
+    if (isType(obj, 'object')) {
+      source = {};
+    } else if (isType(obj, 'array')) {
+      source = [];
+    } else {
+      return null;
+    }
+    return (function clone(obj, source) {
+      if (isType(obj, 'object')) {
+        var key;
+        for (key in obj) {
+          if (isType(obj[key], 'object')) {
+            source[key] = clone(obj[key], {});
+          } else if (isType(obj[key], 'array')) {
+            source[key] = clone(obj[key], []);
+          } else {
+            source[key] = obj[key];
+          }  
+        }
+      }
+      return source;
+    })(obj, source);
   }
   function toLargeCamel(str) {
-    return str.replace(_LargeCamelReg, function (char) {
-      return char.toUpperCase();
-    });
+    if (_LargeCamelReg.test(str)) {
+      str = str.split('-');
+      forEach(str, function (item, index) {
+        str[index] = item.replace(/^\w/, function (char) {
+          return char.toUpperCase();
+        });
+      });
+      str = str.join('-');
+    }
+    return str;
   }
   function toArray(likeArray) {
     return [].slice.call(likeArray);

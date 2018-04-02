@@ -1,5 +1,9 @@
 # Changes
 
+# 1.1.2
+
+- Fix: global config's convert can't merge with instance's header.
+
 # 1.1.1
 
 - Fix: global config's header can't be standardized.
