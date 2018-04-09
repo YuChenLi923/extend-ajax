@@ -1,5 +1,9 @@
 # Changes
 
+# 1.1.3
+
+- Fix: when Content-Type is 'formData', request will happen wrong. 
+
 # 1.1.2
 
 - Fix: global config's convert can't merge with instance's header.

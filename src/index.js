@@ -191,8 +191,10 @@
   }
   function setHeader(xhr, header, charset) {
     forEach(header, function (value, key) {
-      key === 'Content-Type' && (value += ';charset=' + charset);
-      (value === 'formData' && key === 'Content-Type') || (xhr.setRequestHeader(key, value));
+      if (value) {
+        key === 'Content-Type' && value !== 'formData' && (value += ';charset=' + charset);
+        (value === 'formData' && key === 'Content-Type') || (xhr.setRequestHeader(key, value));
+      }
     });
   }
   function forEach(items, cb) {
