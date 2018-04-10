@@ -51,7 +51,9 @@
       var temp = '';
       if (isType(data, 'object')) {
         forEach(data, function (value, key) {
-          temp += ('&' + key + '=' + encodeURI(value));
+          if (typeof value !== 'undefined') {
+            temp += ('&' + key + '=' + encodeURI(value));
+          }
         });
       }
       data = temp.substring(1);
@@ -66,7 +68,9 @@
               temp.append(key, file);
             });
           } else {
-            temp.append(key, value);
+            if (typeof value !== 'undefined') {
+              temp.append(key, value);
+            }
           }
         });
         data = temp;

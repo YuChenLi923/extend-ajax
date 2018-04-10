@@ -1,5 +1,9 @@
 # Changes
 
+# 1.1.4
+
+- Fix:When the key value of the transmitted data is undefined, it will still be sent.
+
 # 1.1.3
 
 - Fix: when Content-Type is 'formData', request will happen wrong. 
@@ -14,7 +18,7 @@
 - Fix: instance's config can affect global config
 
 # 1.1.0
-
+d
 - Add two new events: 'start'、'end'
 
 # 1.0.1
