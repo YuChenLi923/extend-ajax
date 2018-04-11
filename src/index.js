@@ -114,7 +114,7 @@
             source[key] = clone(obj[key], []);
           } else {
             source[key] = obj[key];
-          }  
+          }
         }
       }
       return source;
