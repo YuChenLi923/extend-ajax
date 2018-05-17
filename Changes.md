@@ -1,12 +1,17 @@
 # Changes
 
+# 1.1.5
+
+- Add an option:dev
+- Add warn:When the key value of the transmitted data is undefined and options.dev is true, it will send a warn.
+
 # 1.1.4
 
 - Fix:When the key value of the transmitted data is undefined, it will still be sent.
 
 # 1.1.3
 
-- Fix: when Content-Type is 'formData', request will happen wrong. 
+- Fix: when Content-Type is 'formData', request will happen wrong.
 
 # 1.1.2
 

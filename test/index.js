@@ -85,6 +85,15 @@ describe('test request', function () {
       test: 9999
     });
   });
+  it('send undefined data', function (done) {
+    ajax('test/post', 'post', {
+      dev: true
+    }).send({
+      a: undefined
+    }).then(function (res) {
+      done();
+    });
+  });
 });
 describe('test cache', function () {
   it('cache ajax', function (done) {

@@ -4,13 +4,17 @@
 ![Downloads](http://img.shields.io/npm/dm/extend-ajax.svg?style=flat)
 [![Coverage Status](https://coveralls.io/repos/github/YuChenLi923/extend-ajax/badge.svg?branch=master)](https://coveralls.io/github/YuChenLi923/extend-ajax?branch=master)
 
-- returns Promises（if support it）
+[中文文档](./README_zh-CN.md)
+
+## Features
+
 - ability to specify request headers
 - ability to get response headers
 - if it isn't jsonp,it can cache response data
 - pre-treat response received
 - support jsonp
 - support IE8+
+
 
 ## Install
 
@@ -132,6 +136,7 @@ create one ajax object, but it can't send a request immediately, you need use aj
   - convert \<function>  pre-treat response data received, the function have one argument:response data.if set it, it must return a data handled,or when success event happen,we can't get data from res.
   - jsonpName \<String> name of the callback functions that handle jsonp response,default: 'jsonpCallback'
   - jsonpParma \<String> name of the query string parameter to specify the callback,default: 'callback'
+  - dev \<Boolean> default: false, if true, current environment is development,or else it is production.
   - header \<object> set http header.default: {'Content-Type': 'form', 'Accept': 'json'}
     - Content-Type \<string> you can set: 'text', 'json', 'form'(default), 'formData', 'html' and standard content-type value
     - Accept \<string> you can set: 'text', 'json', 'html' and standard Accept value

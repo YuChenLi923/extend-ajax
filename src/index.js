@@ -36,7 +36,8 @@
     cacheSize: 0,
     cacheExp: 300,
     jsonpName: 'jsonpCallback',
-    jsonpParam: 'callback'
+    jsonpParam: 'callback',
+    dev: false
   };
   var _encodeMethods = {
     'application/json': function (data) {
@@ -48,11 +49,14 @@
       return data;
     },
     'application/x-www-form-urlencoded': function (data) {
-      var temp = '';
+      var temp = '',
+          _this = this;
       if (isType(data, 'object')) {
         forEach(data, function (value, key) {
           if (typeof value !== 'undefined') {
             temp += ('&' + key + '=' + encodeURI(value));
+          } else if (_this.options.dev) {
+            warn(key + ' of the data sent to ' + _this.url + ' is undefined, so it will be removed from the sent data');
           }
         });
       }
@@ -61,7 +65,8 @@
     },
     'formData': function (data) {
       if (isType(data, 'object') && support.XHR2) {
-        var temp = new FormData();
+        var temp = new FormData(),
+            _this = this;
         forEach(data, function (value, key) {
           if (isType(value, 'FileList')) {
             forEach(value, function (file) {
@@ -70,6 +75,8 @@
           } else {
             if (typeof value !== 'undefined') {
               temp.append(key, value);
+            } else if (_this.options.dev) {
+              warn(key + ' of the data sent to ' + _this.url + ' is undefined, so it will be removed from the sent data');
             }
           }
         });
@@ -80,6 +87,13 @@
   };
   var _LargeCamelReg = /^\w+(-\w+)+/;
   var _DataType = / (\w+)]/;
+  function warn(info) {
+    if (typeof console.warn === 'function') {
+      console.warn('extend-ajax warn: ' + info);
+    } else {
+      console.log('extend-ajax warn: ' + info);
+    }
+  }
   function extend(target, source, filter) {
     var key,
         flag;
@@ -401,15 +415,14 @@
       form.attachEvent('submit', createTimer);
     }
   }
-  function encodeData(data, contentType) {
-    return _encodeMethods[contentType] ? _encodeMethods[contentType](data) : '';
+  function encodeData(data, contentType, _this) {
+    return _encodeMethods[contentType] ? _encodeMethods[contentType].call(_this, data) : '';
   }
   // ajax对象
   var ajax = function () {
     return new _ajax.init(toArray(arguments));
   };
   var _ajax = ajax.prototype;
-  // 初始化ajax对象， 内部使用
   extend(_ajax, {
     init: function Ajax(args) {
       var url = args.shift() || '',
@@ -490,8 +503,8 @@
               cacheData = ajax.cache[cacheKey];
         }
         if (!cacheSize || !verifyCache(cacheData, cacheSize, cacheKey)) {
-          query && (query = encodeData(query, _contentTypes['form'])) && (url += '?' + query);
-          data = isGet ? encodeData(data, _contentTypes['form']) : encodeData(data, options.header['Content-Type']);
+          query && (query = encodeData(query, _contentTypes['form'], this)) && (url += '?' + query);
+          data = isGet ? encodeData(data, _contentTypes['form'], this) : encodeData(data, options.header['Content-Type'], this);
           xhr.open(type, url, async);
           setHeader(xhr, options.header, options.charset);
           xhr.send(data);
