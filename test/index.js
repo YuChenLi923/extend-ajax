@@ -188,7 +188,7 @@ describe('test form submit', function () {
     ajax.form('my-form-timeout', {
       timeout: 5
     }).on('success', function (res) {
-      done();
+      alert(1);
       console.log(res);
     }).on('timeout', function () {
       done();

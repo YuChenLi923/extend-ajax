@@ -19,8 +19,8 @@
   var _accepts = {
     xml: 'application/xml, text/xml',
     html: 'text/html',
-    script: 'text/javascript, application/javascript',
-    json: 'application/json, text/javascript',
+    script: 'text/javascript',
+    json: 'application/json',
     text: 'text/plain',
     _default: '*/*'
   };
@@ -87,6 +87,8 @@
   };
   var _LargeCamelReg = /^\w+(-\w+)+/;
   var _DataType = / (\w+)]/;
+  var pool = []; // xhr对象池
+  // 警告信息
   function warn(info) {
     if (typeof console.warn === 'function') {
       console.warn('extend-ajax warn: ' + info);
@@ -94,6 +96,7 @@
       console.log('extend-ajax warn: ' + info);
     }
   }
+
   function extend(target, source, filter) {
     var key,
         flag;
@@ -109,6 +112,7 @@
     }
     return target;
   }
+
   function cloneObject(obj) {
     var source;
     if (isType(obj, 'object')) {
@@ -134,6 +138,7 @@
       return source;
     })(obj, source);
   }
+
   function toLargeCamel(str) {
     if (_LargeCamelReg.test(str)) {
       str = str.split('-');
@@ -146,9 +151,11 @@
     }
     return str;
   }
+
   function toArray(likeArray) {
     return [].slice.call(likeArray);
   }
+
   function protect(obj, propertys) {
     if (support.DefineProperty) {
       forEach(propertys, function (property) {
@@ -159,6 +166,7 @@
       });
     }
   }
+
   function getHashKey(obj) {
     var array = [],
         hash = '';
@@ -180,6 +188,7 @@
     });
     return hash;
   }
+
   function getHeader(xhr) {
     var headerStr = xhr.getAllResponseHeaders(),
         itemsStr = headerStr.split('\n'),
@@ -191,6 +200,7 @@
     });
     return header;
   }
+
   function setKeyToLargeCamel(obj) {
     for (var key in obj) {
       var temp = obj[key];
@@ -198,6 +208,7 @@
       obj[toLargeCamel(key)] = temp;
     }
   }
+
   function toStandardHeader(header) {
     forEach(header, function (value, key) {
       var isContentType = key === 'Content-Type',
@@ -207,6 +218,7 @@
       header[key] = value;
     });
   }
+
   function setHeader(xhr, header, charset) {
     forEach(header, function (value, key) {
       if (value) {
@@ -215,6 +227,7 @@
       }
     });
   }
+
   function forEach(items, cb) {
     var i,
         len;
@@ -228,10 +241,12 @@
       }
     }
   }
+
   function isType(data, type) {
     var expectType = _DataType.exec(Object.prototype.toString.call(data))[1].toLowerCase();
     return type.toLowerCase() === expectType;
   }
+
   function verifyCache(cache, size, key) {
     var result = true;
     if (cache && ((cache.exp + cache.time < +new Date()) || (ajax.cacheCurSize > size))) {
@@ -243,7 +258,9 @@
     }
     return result;
   }
-  function getXhr() {
+
+  // 创建兼容性xhr对象
+  function createXHR() {
     var activeXs = ['Msxml2.XMLHTTP.6.0', 'Msxml2.XMLHTTP.3.0', 'Msxml2.XMLHTTP'],
         xhr;
     try {
@@ -258,6 +275,18 @@
     }
     return xhr;
   }
+  // 获取xhr对象
+  function getXhr() {
+    var xhr;
+    if (pool.length === 0) {
+      xhr = createXHR();
+    } else {
+      // 取出第一个xhr
+      xhr = pool.shift();
+    }
+    return xhr;
+  }
+
   function addXHR2Listener(xhr) {
     var callback = ['abort', 'progress'],
         _this = this;
@@ -313,6 +342,7 @@
       }
     };
   }
+
   function createScript(url) {
     var script = doc.createElement('script'),
         _this = this,
@@ -355,6 +385,7 @@
       body.removeChild(script);
     };
   }
+
   function addJSONPCallback(cb) {
     var _this = this;
     win[this.options.jsonpName] = function () {
@@ -364,6 +395,7 @@
       }
     };
   }
+
   function addFormListener(form, options) {
     var id = +new Date(),
         iframe = doc.createElement('frame'),
@@ -408,13 +440,14 @@
       createTimer();
     };
     try {
-      iframe.onload = load;
+      iframe.addEventListener('load', load);
       form.addEventListener('submit', createTimer);
     } catch (e) {
       iframe.attachEvent('load', load);
       form.attachEvent('submit', createTimer);
     }
   }
+
   function encodeData(data, contentType, _this) {
     return _encodeMethods[contentType] ? _encodeMethods[contentType].call(_this, data) : '';
   }
@@ -424,42 +457,28 @@
   };
   var _ajax = ajax.prototype;
   extend(_ajax, {
+    // 初始化ajax对象,创建xhr对象或者从对象池中取出
     init: function Ajax(args) {
       var url = args.shift() || '',
           type = typeof args[0] === 'string' ? (args[0] || 'post') : 'post',
           options = args[1] ? (args[1] || {}) : args[0],
-          xhr = this.xhr = type === 'jsonp' ? null : getXhr(),
-          _this = this,
           formElement = typeof url === 'object' ? url : null;
       formElement && (url = null);
-      options && options.header && (setKeyToLargeCamel(options.header) && toStandardHeader(options.header));
+      if (options && options.header) {
+        setKeyToLargeCamel(options.header);
+        toStandardHeader(options.header);
+      }
       this.type = type;
       this.url = url;
       this.formElement = formElement;
-      options = this.options = extend(cloneObject(ajax.options || _options), options, ['host']);
-      if (!formElement && support.XHR2 && xhr) {
-        addXHR2Listener.call(this, xhr, options);
-      }
-      var addListener = function () {
-        if (formElement) {
-          addFormListener.call(_this, formElement, options);
-        } else if (xhr) {
-          addXHRListener.call(_this, xhr, options);
-        }
-      };
-      if (support.Promise) {
-        this.promise = new Promise(function (resolve) {
-          addListener();
-          _this.resolve = resolve;
-        });
-        protect(this, ['promise', 'resolve']);
-      } else {
-        addListener();
+      this.options = extend(cloneObject(ajax.options || _options), options, ['host']);
+      if (formElement) {
+        addFormListener.call(this, formElement, this.options);
       }
     },
     on: function (event, cb) {
       if (isType(cb, 'function')) {
-        if (event === 'success' && !this.xhr) {
+        if (event === 'success' && !this.xhr && !this.formElement) {
           addJSONPCallback.call(this, cb);
         } else {
           this['$' + event] = cb;
@@ -482,15 +501,35 @@
       if (this.formElement) {
         return;
       }
-      var xhr = this.xhr,
-          type = this.type,
+      var type = this.type,
+          xhr = this.xhr = type === 'jsonp' ? null : getXhr(),
           url = this.url,
           options = this.options,
           async = options.async,
           cacheSize = options.cacheSize,
           query = options.query,
           rootHost = ajax.options.host,
-          isGet = type === 'get';
+          isGet = type === 'get',
+          _this = this;
+
+      if (support.XHR2 && xhr) {
+        addXHR2Listener.call(this, xhr, options);
+      }
+      var addListener = function () {
+        if (xhr) {
+          addXHRListener.call(_this, xhr, options);
+        }
+      };
+      if (support.Promise) {
+        this.promise = new Promise(function (resolve) {
+          addListener();
+          _this.resolve = resolve;
+        });
+        protect(this, ['promise', 'resolve']);
+      } else {
+        addListener();
+      }
+
       if (isType(rootHost, 'object') && isType(this.host, 'string')) {
         url = rootHost[this.host] + url;
       } else if (isType(rootHost, 'string')) {
@@ -512,7 +551,7 @@
           this.emit('success', cacheData.res);
         }
       } else {
-        // jsonp
+        // jsonP
         url += '?' + options.jsonpParam + '=' + options.jsonpName;
         createScript.call(this, url);
       }
@@ -525,8 +564,10 @@
         this.resolve(args[0]);
       }
       this['$' + event] && this['$' + event].apply(null, args);
-      if (event !== 'progress' && event !== 'end' && event !== 'start ') {
+      // 请求失败 成功,都会触发end
+      if (event !== 'progress' && event !== 'end' && event !== 'start') {
         this.emit('end');
+        pool.length <= ajax.poolSize && pool.push(this.xhr);
       }
     }
   });
@@ -538,8 +579,9 @@
       }
     },
     options: _options,
-    cacheCurSize: 2,
+    cacheCurSize: 2, // 缓存容量
     cache: {},
+    poolSize: 10,
     form: function (id, options) {
       var formElement = doc.getElementById(id);
       if (!formElement) {
