@@ -468,6 +468,7 @@
         setKeyToLargeCamel(options.header);
         toStandardHeader(options.header);
       }
+      this.xhr = type === 'jsonp' ? null : getXhr();
       this.type = type;
       this.url = url;
       this.formElement = formElement;
@@ -502,7 +503,7 @@
         return;
       }
       var type = this.type,
-          xhr = this.xhr = type === 'jsonp' ? null : getXhr(),
+          xhr = this.xhr ? this.xhr : getXhr(),
           url = this.url,
           options = this.options,
           async = options.async,

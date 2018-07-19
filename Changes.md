@@ -1,5 +1,9 @@
 # Changes
 
+# 1.2.1
+
+- Fix: the success callback function added before calling the send method can not be called.
+
 # 1.2.0
 
 - Fix: page jump exceptionally when listening to form submission

@@ -183,6 +183,8 @@ add event listener for the ajax object.if async is false, ajax.on() must be call
 
 specify global options, each ajax object will apply the options and own options.
 
+- poolSize \<number> xhr pool's size
+
 ## test
 
 ```
