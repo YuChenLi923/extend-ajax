@@ -32,7 +32,7 @@ module.exports = function (config) {
     reporters: ['coverage', 'coveralls'],
     coverageReporter: {
       type: 'lcov',
-      dir: 'coverage'
+      dir: 'coverage/'
     },
     port: 9876,
     colors: true,

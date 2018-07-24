@@ -6,7 +6,7 @@
   "scripts": {
     "test": "karma start",
     "lint": "eslint src",
-    "build": "set TRAVIS=true && npm run lint && npm run test"
+    "build": "npm run lint && cross-env TRAVIS=true npm run test"
   },
   "author": "YuChenLi923<liyc_code@163.com>",
   "license": "MIT",
@@ -22,6 +22,7 @@
   ],
   "devDependencies": {
     "body-parser": "^1.18.2",
+    "cross-env": "^5.2.0",
     "eslint": "^4.7.2",
     "eslint-config-standard": "^10.2.1",
     "eslint-plugin-import": "^2.7.0",

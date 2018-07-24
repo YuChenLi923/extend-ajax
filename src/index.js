@@ -503,7 +503,7 @@
         return;
       }
       var type = this.type,
-          xhr = this.xhr ? this.xhr : getXhr(),
+          xhr = this.xhr || type === 'jsonp' ? this.xhr : getXhr(),
           url = this.url,
           options = this.options,
           async = options.async,

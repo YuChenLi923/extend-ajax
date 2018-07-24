@@ -1,5 +1,5 @@
 var ajax = require('extend-ajax');
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000000;
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 9999999999999;
 ajax.config({
   convert: function (data) {
     return data;
@@ -72,7 +72,7 @@ describe('test request', function () {
     });
   });
   it('start', function (done) {
-    var myAjax = ajax('test/start', 'get', {
+    var myAjax = ajax('test/start', 'post', {
       header: {
         'Content-Type': 'form'
       }

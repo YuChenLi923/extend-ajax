@@ -1,5 +1,9 @@
 # Changes
 
+# 1.2.2
+
+- Fix: the jsonp fail
+
 # 1.2.1
 
 - Fix: the success callback function added before calling the send method can not be called.
