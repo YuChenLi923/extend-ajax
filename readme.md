@@ -137,6 +137,7 @@ create one ajax object, but it can't send a request immediately, you need use aj
   - jsonpName \<String> name of the callback functions that handle jsonp response,default: 'jsonpCallback'
   - jsonpParma \<String> name of the query string parameter to specify the callback,default: 'callback'
   - dev \<Boolean> default: false, if true, current environment is development,or else it is production.
+  - withCredentials \<Boolean> default: false, whether or not cross-site Access-Control requests should be made using credentials such as cookies, authorization headers or TLS client certificates
   - header \<object> set http header.default: {'Content-Type': 'form', 'Accept': 'json'}
     - Content-Type \<string> you can set: 'text', 'json', 'form'(default), 'formData', 'html' and standard content-type value
     - Accept \<string> you can set: 'text', 'json', 'html' and standard Accept value

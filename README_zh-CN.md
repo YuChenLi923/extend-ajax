@@ -134,6 +134,7 @@ jsonp传输
   - convert \<function>  在使用响应数据前,对其进行处理,之后通过then(({data}) => {...})或者on('success', ({data})=> {...}),我们获取的data就是这个convert函数返回给我们的。
   - jsonpName \<String>  处理jsonp响应的函数名称,默认值: 'jsonpCallback'
   - jsonpParma \<String> jsonp传输时回调函数的键名,default: 'callback'
+  - withCredentials \<boolean> 是否允许ajax请求携带验证信息,例如:cookie.
   - dev \<Boolean> 默认值: false。如果为true,则环境就是development,否则为production。
   - header \<object> 设置头信息。默认值: {'Content-Type': 'form', 'Accept': 'json'}
     - Content-Type \<string> 可以设置为: 'text', 'json', 'form'(default), 'formData', 'html' 以及标准的content-type。

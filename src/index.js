@@ -546,6 +546,9 @@
           query && (query = encodeData(query, _contentTypes['form'], this)) && (url += '?' + query);
           data = isGet ? encodeData(data, _contentTypes['form'], this) : encodeData(data, options.header['Content-Type'], this);
           xhr.open(type, url, async);
+          if (options.withCredentials) {
+            xhr.withCredentials = true;
+          }
           setHeader(xhr, options.header, options.charset);
           xhr.send(data);
         } else {

@@ -1,5 +1,9 @@
 # Changes
 
+# 1.2.3
+
+- Add an option: withCredentials
+
 # 1.2.2
 
 - Fix: the jsonp fail
