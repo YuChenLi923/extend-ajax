@@ -1,5 +1,9 @@
 # Changes
 
+# 1.2.4
+
+- Add an option: scope
+
 # 1.2.3
 
 - Add an option: withCredentials

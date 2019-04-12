@@ -305,6 +305,7 @@
       var readyState = xhr.readyState,
           status,
           responseText,
+          scope = options.scope != null ? options.scope : null,
           convert = options.convert,
           res = {};
       if (readyState === 4) {
@@ -312,7 +313,7 @@
         status = xhr.status;
         res.status = status;
         res.header = getHeader(xhr);
-        res.data = isType(convert, 'function') ? convert(responseText) : responseText;
+        res.data = isType(convert, 'function') ? convert.call(scope, responseText) : responseText;
         timer && clearTimeout(timer);
         if ((status >= 200 && status < 300) || status === 304) {
           if (options.cacheSize) {
@@ -563,11 +564,12 @@
     },
     emit: function () {
       var args = toArray(arguments),
-          event = args.shift();
+          event = args.shift(),
+          scope = options.scope != null ? options.scope : null;
       if (this.promise && this.resolve && (event === 'success' || event === 'fail')) {
-        this.resolve(args[0]);
+        this.resolve.call(scope, args[0]);
       }
-      this['$' + event] && this['$' + event].apply(null, args);
+      this['$' + event] && this['$' + event].apply(scope, args);
       // 请求失败 成功,都会触发end
       if (event !== 'progress' && event !== 'end' && event !== 'start') {
         this.emit('end');

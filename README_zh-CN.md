@@ -126,20 +126,22 @@ jsonp传输
 - options \<object>
 
   - async \<boolean> 默认值: true
-  - host \<string> 服务器主机的地址,默认值: ''.
-  - timeout \<number> 请求超时的响应时间,单位:ms.默认值:0,0的情况下不会触发响应超时事件
   - cacheSize \<number> 设置缓存大小,默认值: 0
   - cacheExp \<number> 设置缓存时间,单位:秒,默认值:300
   - charset \<stirng> 设置传输数据的编码字符集,默认值: 'utf-8'
-  - convert \<function>  在使用响应数据前,对其进行处理,之后通过then(({data}) => {...})或者on('success', ({data})=> {...}),我们获取的data就是这个convert函数返回给我们的。
+  - convert \<function>  在使用响应数据前,对其进行处理,之后通过then(({data}) => {...})或者on('success', ({data})=> {...}),我们获取的data就是这个convert函数返回给我们的。  
+  - dev \<Boolean> 默认值: false。如果为true,则环境就是development,否则为production。
+  - host \<string> 服务器主机的地址,默认值: ''.
+  - header \<object> 设置头信息。默认值: {'Content-Type': 'form', 'Accept': 'json'}
+      - Content-Type \<string> 可以设置为: 'text', 'json', 'form'(default), 'formData', 'html' 以及标准的content-type。
+      - Accept \<string> 可以设置为: 'text', 'json', 'html'以及标准的Accept值。
+      - ... 
   - jsonpName \<String>  处理jsonp响应的函数名称,默认值: 'jsonpCallback'
   - jsonpParma \<String> jsonp传输时回调函数的键名,default: 'callback'
+  - scope \<object> 默认:null, 定义回调函数的作用域。
+  - timeout \<number> 请求超时的响应时间,单位:ms.默认值:0,0的情况下不会触发响应超时事件
   - withCredentials \<boolean> 是否允许ajax请求携带验证信息,例如:cookie.
-  - dev \<Boolean> 默认值: false。如果为true,则环境就是development,否则为production。
-  - header \<object> 设置头信息。默认值: {'Content-Type': 'form', 'Accept': 'json'}
-    - Content-Type \<string> 可以设置为: 'text', 'json', 'form'(default), 'formData', 'html' 以及标准的content-type。
-    - Accept \<string> 可以设置为: 'text', 'json', 'html'以及标准的Accept值。
-    - ...
+ 
 
 ### ajax.form(id[,options])
 返回一个ajax对象,但是它不能手动发送任何请求,请求由表单的提交按钮控制。它仅能监听'success', 'end', 'start', 'timeout'这些事件。

@@ -128,21 +128,22 @@ create one ajax object, but it can't send a request immediately, you need use aj
 - options \<object>
 
   - async \<boolean> default: true
-  - host \<string> host url,default: ''.
-  - timeout \<number> the number of milliseconds a request can take before automatically being terminated
   - cacheSize \<number> set size of cache, default: 0
   - cacheExp \<number> set the cache expiration time relative to the present, default: 300, unit: s.
   - charset \<stirng> set http charset,default: 'utf-8'
   - convert \<function>  pre-treat response data received, the function have one argument:response data.if set it, it must return a data handled,or when success event happen,we can't get data from res.
+  - dev \<Boolean> default: false, if true, current environment is development,or else it is production.  
+  - host \<string> host url,default: ''.
   - jsonpName \<String> name of the callback functions that handle jsonp response,default: 'jsonpCallback'
   - jsonpParma \<String> name of the query string parameter to specify the callback,default: 'callback'
-  - dev \<Boolean> default: false, if true, current environment is development,or else it is production.
-  - withCredentials \<Boolean> default: false, whether or not cross-site Access-Control requests should be made using credentials such as cookies, authorization headers or TLS client certificates
   - header \<object> set http header.default: {'Content-Type': 'form', 'Accept': 'json'}
-    - Content-Type \<string> you can set: 'text', 'json', 'form'(default), 'formData', 'html' and standard content-type value
-    - Accept \<string> you can set: 'text', 'json', 'html' and standard Accept value
-    - ...
-
+      - Content-Type \<string> you can set: 'text', 'json', 'form'(default), 'formData', 'html' and standard content-type value
+      - Accept \<string> you can set: 'text', 'json', 'html' and standard Accept value
+      - ...  
+  - scope \<object> default null, define the scope of callback function.  
+  - timeout \<number> the number of milliseconds a request can take before automatically being terminated
+  - withCredentials \<Boolean> default: false, whether or not cross-site Access-Control requests should be made using credentials such as cookies, authorization headers or TLS client certificates
+  
 ### ajax.form(id[,options])
 
 return ajax object, but it can't send any ajax request. It only be used to listen the data response submitted by the form.It only support 'success', 'end', 'start' and 'timeout' event.
