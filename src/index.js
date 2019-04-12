@@ -565,6 +565,7 @@
     emit: function () {
       var args = toArray(arguments),
           event = args.shift(),
+          options = this.options,
           scope = options.scope != null ? options.scope : null;
       if (this.promise && this.resolve && (event === 'success' || event === 'fail')) {
         this.resolve.call(scope, args[0]);
