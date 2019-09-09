@@ -86,7 +86,7 @@
     }
   };
   var _LargeCamelReg = /^\w+(-\w+)+/;
-  var _DataType = / (\w+)]/;
+    var _DataType = /(\w+)]/;
   var pool = []; // xhr对象池
   // 警告信息
   function warn(info) {
@@ -173,6 +173,9 @@
     (function getKeys(array, obj, preKey) {
       var key;
       for (key in obj) {
+        if (obj[key] == null) {
+          continue;
+        }
         if (isType(obj[key], 'object') || isType(obj[key], 'array')) {
           getKeys(array, obj[key], key + '.');
         } else {
@@ -317,7 +320,11 @@
         timer && clearTimeout(timer);
         if ((status >= 200 && status < 300) || status === 304) {
           if (options.cacheSize) {
-            var cacheKey = _this.url + JSON.stringify(getHashKey(_this.data));
+            var cacheKey = _this.url + '-' + getHashKey({
+              body: _this.data,
+              query: _this.options.query,
+              header: _this.options.header
+            });
             if (!ajax.cache[cacheKey]) {
               ajax.cache[cacheKey] = {
                 res: res,
@@ -537,11 +544,16 @@
       } else if (isType(rootHost, 'string')) {
         url = rootHost + url;
       }
+      this.url = url;
       this.data = data;
       if (xhr) {
         if (cacheSize) {
-          var cacheKey = url + JSON.stringify(getHashKey(data)),
-              cacheData = ajax.cache[cacheKey];
+          var cacheKey = url + '-' + getHashKey({
+            body: data,
+            query: query,
+            header: options.header
+          });
+          var cacheData = ajax.cache[cacheKey];
         }
         if (!cacheSize || !verifyCache(cacheData, cacheSize, cacheKey)) {
           query && (query = encodeData(query, _contentTypes['form'], this)) && (url += '?' + query);

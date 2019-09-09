@@ -1,4 +1,6 @@
 # Changes
+# 1.2.5
+- Fix: cache's hash calculation error
 
 # 1.2.4
 
