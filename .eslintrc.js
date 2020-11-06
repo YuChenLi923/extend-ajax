@@ -1,11 +1,26 @@
 module.exports = {
-    "extends": "standard",
-    "rules": {
-      "semi": ["error", "always"],
-      "one-var": 0,
-      "new-cap": 0,
-      "no-undef": 0,
-      "indent": ["error", 2, { "VariableDeclarator": { "var": 2, "let": 2, "const": 3 } }],
-      "space-before-function-paren": ["error", {"anonymous": "always", "named": "never", "asyncArrow": "always"}]
-    }
+  root: true,
+  parser: '@typescript-eslint/parser',
+  plugins: ["@typescript-eslint"],
+  parserOptions: {
+    project: "./tsconfig.json",
+    createDefaultProgram: true
+  },
+  extends: [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:@typescript-eslint/recommended-requiring-type-checking",
+  ],
+  env: {
+    node: true,
+    browser: true
+  },
+  rules: {
+    "@typescript-eslint/no-var-requires": 0,
+    "@typescript-eslint/require-await": 0,
+    "@typescript-eslint/no-unused-vars": 0,
+    "@typescript-eslint/no-explicit-any": 0,
+    "require-atomic-updates": 0
+  }
 };

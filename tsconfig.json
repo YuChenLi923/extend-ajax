@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "ES5",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "ES2015",
+      "ES2015.Promise"
+    ],
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "module": "UMD",
+    "baseUrl": ".",
+    "typeRoots": ["./src"]
+  },
+  "include": [
+    "src"
+  ]
+}

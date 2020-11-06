@@ -2,7 +2,6 @@
 
 test/
 node_modules/
-mochawesome-report/
 coverage/
 test/
 build/
