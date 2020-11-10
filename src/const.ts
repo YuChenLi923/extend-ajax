@@ -19,3 +19,18 @@ export const CONTENT_TYPE_MAP: {
   form: 'application/x-www-form-urlencoded',
   _default: 'application/x-www-form-urlencoded'
 };
+
+export const DEFAULT_OPTIONS: AjaxOptions = {
+  timeout: false,
+  isAsync: true,
+  header: {
+    'Accept': ACCEPT_MAP['_default'],
+    'Content-Type': CONTENT_TYPE_MAP['_default']
+  },
+  charset: 'utf-8',
+  host: '',
+  cacheSize: 0,
+  cacheExp: 300,
+  jsonpName: 'jsonpCallback',
+  jsonpParam: 'callback'
+};

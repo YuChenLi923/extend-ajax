@@ -1,5 +1,7 @@
 type HTTP_METHOD = 'get' | 'post' | 'delete' | 'put' | 'jsonp';
 type CALLBACK = (data?: any) => void
+type EVENT_TYPE = 'success' | 'fail' | 'start' | 'end' | 'timeout' | 'abort' | 'progress';
+type AjaxEvents = Record<EVENT_TYPE, CALLBACK[]>;
 interface HttpHeader {
   'Content-Type'?: 'text' | 'json' | 'form' | 'formData' | 'html' | string;
   Accept?: 'text' | 'json' | 'form' | string;
@@ -11,20 +13,35 @@ interface AjaxOptions {
   cacheSize?: number;
   cacheExp?: number;
   charset?: string;
-  convert?: (data: string) => any;
+  convert?(data?: string):string | JSONData | null;
   host?: string;
   header?: HttpHeader;
   jsonpName?: string;
-  jsonpParma?: string;
+  jsonpParam?: string;
   scope?: any;
-  timeout?: number;
+  timeout?: number | false;
   withCredentials?: boolean;
+  query?: Record<string, string | number>
 }
 
-interface AjaxEvents {
-  [eventName: string]: CALLBACK[];
+
+
+interface JSONData {
+  [propName: string]: any;
 }
 
+interface AjaxResData {
+  status?: number;
+  data?: string | JSONData | null;
+  header?: HttpHeader;
+  error?: Error;
+}
+
+interface AjaxCache {
+  res: AjaxResData;
+  exp: number;
+  time: number;
+}
 type AjaxConfig = [method: HTTP_METHOD, options: AjaxOptions] | [options: AjaxOptions]
 
 declare class ExtendAjax {

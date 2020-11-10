@@ -5,15 +5,20 @@
       "dom",
       "dom.iterable",
       "ES2015",
-      "ES2015.Promise"
+      "ES2015.Promise",
+      "esnext"
     ],
+    "skipLibCheck": true,
+    "isolatedModules": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
-    "module": "UMD",
+    "module": "esnext",
+    "allowJs": true,
     "baseUrl": ".",
-    "typeRoots": ["./src"]
+    "typeRoots": ["./src",  "./node_modules/@types"],
+    "moduleResolution": "Node"
   },
   "include": [
     "src"

@@ -1,10 +1,11 @@
 {
   "name": "extend-ajax",
-  "version": "1.2.5",
+  "version": "2.0.0-dev",
   "description": "an AJAX request library",
   "main": "src/index.js",
   "scripts": {
-    "test": "karma start",
+    "cz": "git-cz",
+    "test": "webpack-cli serve --config ./build/webpack.test.config.js",
     "lint": "eslint src",
     "build": "webpack --config ./build/webpack.prod.config.js"
   },
@@ -21,17 +22,26 @@
     "yc"
   ],
   "devDependencies": {
+    "@types/lodash": "^4.14.165",
     "@typescript-eslint/eslint-plugin": "^4.6.1",
     "@typescript-eslint/parser": "^4.6.1",
     "eslint": "^7.12.1",
+    "git-cz": "^4.7.1",
+    "html-webpack-plugin": "^4.5.0",
+    "mocha": "^8.2.1",
+    "mocha-loader": "^5.1.5",
     "ts-loader": "^8.0.9",
     "typescript": "^4.0.5",
     "webpack": "^5.4.0",
     "webpack-cli": "^4.2.0",
+    "webpack-dev-server": "^3.11.0",
     "webpack-merge": "^5.3.0"
   },
   "bugs": {
     "url": "https://github.com/YuChenLi923/extend-ajax/issues",
     "email": "liyc_code@163.com"
+  },
+  "dependencies": {
+    "lodash": "^4.17.20"
   }
 }

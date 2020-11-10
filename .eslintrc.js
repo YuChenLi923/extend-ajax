@@ -21,6 +21,7 @@ module.exports = {
     "@typescript-eslint/require-await": 0,
     "@typescript-eslint/no-unused-vars": 0,
     "@typescript-eslint/no-explicit-any": 0,
+    "@typescript-eslint/unbound-method": 0,
     "require-atomic-updates": 0
   }
 };
