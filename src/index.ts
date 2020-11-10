@@ -9,17 +9,18 @@ import {
 } from './util';
 import { DEFAULT_OPTIONS } from './const';
 import formatData from './formatData';
-
+const win = window as Record<string, any>;
 class ExtendAjax {
   static options: AjaxOptions = DEFAULT_OPTIONS;
-  static cache: Record<string, AjaxCache> = {};
-  static cacheCurSize = 0;
-  public url: string;
-  public method: HTTP_METHOD;
   public options: AjaxOptions = {};
+  private url: string;
+  private method: HTTP_METHOD;
+  private static cache: Record<string, AjaxCache> = {};
+  private static cacheCurSize = 0;
   private events: AjaxEvents = {} as AjaxEvents;
   private xhr: XMLHttpRequest | null;
   private pool: XMLHttpRequest[] = [];
+  private script?: HTMLScriptElement;
   private promise?: Promise<any>;
   private resolve?: (data: any) => void
   private reject?: (data: any) => void
@@ -28,8 +29,13 @@ class ExtendAjax {
   constructor(url: string, ...configs:AjaxConfig) {
     let options: AjaxOptions = {};
     if (!configs[1]) {
-      options = configs[0] as AjaxOptions;
-      this.method = 'post';
+      if (typeof configs[0] === 'string') {
+        this.method = configs[0];
+        options = {};
+      } else {
+        this.method = 'get';
+        options = configs[0];
+      }
     } else {
       options = configs[1];
       this.method = configs[0] as HTTP_METHOD;
@@ -98,8 +104,7 @@ class ExtendAjax {
     };
   }
   private sendJSONP(url: string): void {
-    const script = document.createElement('script');
-    const win = window as Record<string, any>;
+    const script = this.script = document.createElement('script');
     const {
       timeout,
       jsonpName = 'jsonpCallback'
@@ -167,7 +172,7 @@ class ExtendAjax {
     }
     return;
   }
-  async send(data: string | Record<string, unknown> | null): Promise<any> {
+  public async send(data?: string | Record<string, unknown> | null): Promise<AjaxResData> {
     this.data = data;
     this.promise = new Promise((resolve, reject) => {
       this.resolve = resolve;
@@ -184,9 +189,10 @@ class ExtendAjax {
       isAsync = true,
       charset = 'utf-8',
       jsonpName = 'jsonpCallback',
-      jsonpParam = 'callback'
+      jsonpParam = 'callback',
+      host = ''
     } = this.options;
-    let url = this.options.host??'' + this.url;
+    let url = host + this.url;
     if (this.xhr) {
       const cacheKey = getHashKey({
         body: data,
@@ -200,6 +206,7 @@ class ExtendAjax {
           url += `?${formatData(query) as string}`;
         }
         const sendData = this.method === 'get' ? formatData(data) : formatData(data, header && header['Content-Type']);
+        console.log(url);
         this.xhr.open(this.method, url, isAsync);
         this.xhr.withCredentials = !!withCredentials;
         setHeader(this.xhr, header || {}, charset);
@@ -211,10 +218,26 @@ class ExtendAjax {
       url += `?${jsonpParam}=${jsonpName}`;
       this.sendJSONP(url);
     }
-    return this.promise;
+    return this.promise as Promise<AjaxResData>;
+  }
+  public abort() {
+    if (this.xhr) {
+      this.xhr.abort();
+      this.emit('abort');
+    } else { // jsonp
+      const { jsonpName } = this.options;
+      if (jsonpName && win[jsonpName]) {
+        win[jsonpName] = null;
+      }
+      if (this.script) {
+        document.body.removeChild(this.script)
+        delete this.script;
+      }
+      this.emit('abort');
+    }
   }
 }
 
-export default function ajax(url: string, method: HTTP_METHOD, options: AjaxOptions):ExtendAjax {
-  return new ExtendAjax(url, method, options);
-};
+export default function ajax(url: string, ...configs: AjaxConfig):ExtendAjax {
+  return new ExtendAjax(url, ...configs);
+}

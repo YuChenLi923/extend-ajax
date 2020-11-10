@@ -2,7 +2,8 @@
   "name": "extend-ajax",
   "version": "2.0.0-dev",
   "description": "an AJAX request library",
-  "main": "src/index.js",
+  "main": "dist/extend-ajax.js",
+  "types": "index.d.ts",
   "scripts": {
     "cz": "git-cz",
     "test": "webpack-cli serve --config ./build/webpack.test.config.js",

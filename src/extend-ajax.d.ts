@@ -13,7 +13,7 @@ interface AjaxOptions {
   cacheSize?: number;
   cacheExp?: number;
   charset?: string;
-  convert?(data?: string):string | JSONData | null;
+  convert?(data?: string):string | Record<string, any> | null;
   host?: string;
   header?: HttpHeader;
   jsonpName?: string;
@@ -24,15 +24,9 @@ interface AjaxOptions {
   query?: Record<string, string | number>
 }
 
-
-
-interface JSONData {
-  [propName: string]: any;
-}
-
 interface AjaxResData {
   status?: number;
-  data?: string | JSONData | null;
+  data?: string | Record<string, any> | null;
   header?: HttpHeader;
   error?: Error;
 }
@@ -42,9 +36,5 @@ interface AjaxCache {
   exp: number;
   time: number;
 }
+
 type AjaxConfig = [method: HTTP_METHOD, options: AjaxOptions] | [options: AjaxOptions]
-
-declare class ExtendAjax {
-  constructor(url: string, method: HTTP_METHOD, options: AjaxOptions)
-}
-

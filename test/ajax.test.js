@@ -1,9 +1,11 @@
 
-import extendAjax from 'extend-ajax';
+import ajax from 'extend-ajax';
 describe('Test', () => {
   it('should succeed', (done) => {
-    console.log(extendAjax);
-    setTimeout(done, 1000);
+    ajax('/test123', 'get').send().then((res) => {
+      console.log(res);
+      done();
+    });
   });
   it('should fail', () => {
     setTimeout(() => {

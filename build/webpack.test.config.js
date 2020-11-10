@@ -2,6 +2,7 @@ const path = require('path');
 const { merge } = require('webpack-merge');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const baseConfig = require('./webpack.base.config');
+const mockServer = require('./mock.server.js');
 const hostname = 'localhost';
 const port = 8081;
 module.exports = merge(baseConfig, {
@@ -17,7 +18,8 @@ module.exports = merge(baseConfig, {
   },
   devServer: {
     host: hostname,
-    port: port
+    port: port,
+    before: mockServer
   },
   module: {
     rules: [
