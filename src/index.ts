@@ -46,7 +46,10 @@ class ExtendAjax {
     }
     this.url = url;
     this.xhr = this.method === 'jsonp' ? null : this.getXHR();
-    this.options = Object.assign({}, ExtendAjax.options, options);
+    this.options = {
+      ...ExtendAjax.options,
+      ...options
+    };
   }
   private verifyCache(cache: AjaxCache, key:string) {
     if (cache && ExtendAjax.options.cacheSize &&
@@ -56,25 +59,33 @@ class ExtendAjax {
       delete ExtendAjax.cache[key];
       --ExtendAjax.cacheCurSize;
       return false;
-    } else if (!cache) {
+    } else if (!cache || ExtendAjax.options.cacheSize === 0) {
      return false;
     }
     return true;
   }
-  private addXHREventListener (xhr:XMLHttpRequest) {
-    const { convert } = this.options;
+  private addXHREventListener (xhr:XMLHttpRequest, that: any) {
+    const {
+      convert,
+      timeout,
+      query,
+      header
+    } = this.options;
     const res:AjaxResData = {};
     xhr.onreadystatechange = () => {
       const { readyState, status } = xhr;
       res.status = status;
       if (readyState === 1) {
         this.emit('start');
-        if (isNumber(this.options.timeout)) {
+        if (isNumber(timeout)) {
           this.timer = window.setTimeout(() => {
             res.error = new Error('request timeout');
             this.emit('timeout');
-          }, this.options.timeout);
+          }, timeout);
         }
+        return;
+      }
+      if (readyState !== 4) {
         return;
       }
       if (readyState === 4) {
@@ -84,14 +95,14 @@ class ExtendAjax {
       if ((status >= 200 && status < 300) || status === 304) {
         const hashKey = getHashKey({
           body: this.data,
-          query: this.options.query,
-          header: this.options.header,
+          query,
+          header,
           url: this.url
         });
-        if (!ExtendAjax.cache[hashKey] && this.options.cacheExp) {
+        if (!ExtendAjax.cache[hashKey] && ExtendAjax.options.cacheExp) {
           ExtendAjax.cache[hashKey] = {
             res,
-            exp: this.options.cacheExp * 1000,
+            exp: ExtendAjax.options.cacheExp * 1000,
             time: +new Date()
           };
           ++ExtendAjax.cacheCurSize;
@@ -121,7 +132,9 @@ class ExtendAjax {
     this.emit('start');
     win[jsonpName] = (...data: any[]) => {
       script.setAttribute('data-load', 'true');
-      this.emit('success', data);
+      this.emit('success', ...data);
+      win[jsonpName] = null;
+      clearTimeout(this.timer as number);
     }
     script.onload = () => {
       if (!script.getAttribute('data-load')) {
@@ -130,8 +143,6 @@ class ExtendAjax {
         document.body.removeChild(script);
       }
       script.onload = null;
-      clearTimeout(this.timer as number);
-      win[jsonpName] = null;
     };
     script.onerror = () => {
       this.emit('fail');
@@ -180,7 +191,7 @@ class ExtendAjax {
       if (!this.xhr) {
         return;
       }
-      this.addXHREventListener(this.xhr);
+      this.addXHREventListener(this.xhr, this);
     });
     const {
       query,
@@ -206,7 +217,6 @@ class ExtendAjax {
           url += `?${formatData(query) as string}`;
         }
         const sendData = this.method === 'get' ? formatData(data) : formatData(data, header && header['Content-Type']);
-        console.log(url);
         this.xhr.open(this.method, url, isAsync);
         this.xhr.withCredentials = !!withCredentials;
         setHeader(this.xhr, header || {}, charset);
@@ -238,6 +248,9 @@ class ExtendAjax {
   }
 }
 
-export default function ajax(url: string, ...configs: AjaxConfig):ExtendAjax {
+const ajax = function (url: string, ...configs: AjaxConfig):ExtendAjax {
   return new ExtendAjax(url, ...configs);
 }
+
+ajax.options = ExtendAjax.options;
+export default ajax;

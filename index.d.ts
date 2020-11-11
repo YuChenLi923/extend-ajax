@@ -8,7 +8,7 @@ declare interface HttpHeader {
   [headerName: string]: string | any;
 }
 declare interface AjaxOptions {
-  isAsync?: boolean; // 默认:true
+  isAsync?: boolean;
   cacheSize?: number;
   cacheExp?: number;
   charset?: string;
@@ -39,6 +39,7 @@ declare class ExtendAjax {
   send(data?: string | Record<string, unknown> | null): Promise<AjaxResData>;
 }
 export default function ejax(url: string, ...configs: AjaxConfig): ExtendAjax;
+ejax.options as AjaxOptions;
 export {
   AjaxConfig,
   AjaxResData,

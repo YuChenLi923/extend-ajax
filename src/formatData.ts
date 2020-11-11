@@ -52,5 +52,4 @@ function formatData(data: unknown, contentType = 'application/x-www-form-urlenco
   }
   return '';
 }
-
 export default formatData;
