@@ -263,5 +263,7 @@ const ajax = function (url: string, ...configs: AjaxConfig):ExtendAjax {
   return new ExtendAjax(url, ...configs);
 }
 
-ajax.options = ExtendAjax.options;
+export const setConfig = function (options: AjaxOptions) {
+  ExtendAjax.options = options;
+}
 export default ajax;

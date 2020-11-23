@@ -1,7 +1,7 @@
 declare type HTTP_METHOD = 'get' | 'post' | 'delete' | 'put' | 'jsonp';
 declare type CALLBACK = (data?: any) => void;
 declare type EVENT_TYPE = 'success' | 'fail' | 'start' | 'end' | 'timeout' | 'abort' | 'progress';
-declare type AjaxConfig = [method: HTTP_METHOD, options: AjaxOptions] | [options: AjaxOptions] | []
+declare type AjaxConfig = [method: HTTP_METHOD, options?: AjaxOptions] | [options: AjaxOptions] | []
 declare interface HttpHeader {
   'Content-Type'?: 'text' | 'json' | 'form' | 'formData' | 'html' | string;
   Accept?: 'text' | 'json' | 'form' | string;
@@ -38,11 +38,6 @@ declare class ExtendAjax {
   on(eventName: EVENT_TYPE, cb: CALLBACK): void;
   send(data?: string | Record<string, unknown> | null): Promise<AjaxResData>;
 }
+
 export default function ejax(url: string, ...configs: AjaxConfig): ExtendAjax;
-ejax.options as AjaxOptions;
-export {
-  AjaxConfig,
-  AjaxResData,
-  AjaxOptions,
-  HTTP_METHOD
-};
+export function setConfig(options: AjaxOptions): void;
