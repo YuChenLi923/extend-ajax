@@ -46,7 +46,14 @@ const formatMethods: Record<string, (data: any) => string | FormData> = {
   }
 };
 
-function formatData(data: unknown, contentType = 'application/x-www-form-urlencoded'): string | FormData {
+function formatData(
+  data: unknown,
+  contentType = 'application/x-www-form-urlencoded',
+  method?: HTTP_METHOD
+): string | FormData {
+  if (method === 'get') {
+    contentType = 'text/plain';
+  }
   if (formatMethods[contentType]) {
     return formatMethods[contentType](data);
   }

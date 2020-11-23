@@ -10,5 +10,5 @@ module.exports = merge(baseConfig, {
   },
   module: {
     unknownContextCritical: false
-  }
+  },
 });

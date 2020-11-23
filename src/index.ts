@@ -99,13 +99,21 @@ class ExtendAjax {
           header,
           url: this.url
         });
-        if (!ExtendAjax.cache[hashKey] && ExtendAjax.options.cacheExp) {
+        if (!ExtendAjax.cache[hashKey] &&
+            ExtendAjax.options.cacheExp &&
+            ExtendAjax.options.cacheSize &&
+            ExtendAjax.options.cacheSize > 0
+        ) {
           ExtendAjax.cache[hashKey] = {
             res,
             exp: ExtendAjax.options.cacheExp * 1000,
             time: +new Date()
           };
           ++ExtendAjax.cacheCurSize;
+          if (ExtendAjax.cacheCurSize > ExtendAjax.options.cacheSize) {
+            const firstKey = Object.keys(ExtendAjax.cache)[0];
+            delete ExtendAjax.cache[firstKey];
+          }
         }
         this.emit('success', res);
       } else {
@@ -122,6 +130,7 @@ class ExtendAjax {
     } = this.options;
     script.src = url;
     script.type = 'text/javascript';
+    console.log(script);
     if (timeout) {
       this.timer = window.setTimeout(() => {
         this.timer = script.onload = script.onerror = null;
@@ -137,6 +146,7 @@ class ExtendAjax {
       clearTimeout(this.timer as number);
     }
     script.onload = () => {
+      console.log('加载完成');
       if (!script.getAttribute('data-load')) {
         this.emit('fail');
         script.onerror = null;
@@ -151,6 +161,7 @@ class ExtendAjax {
       document.body.removeChild(script);
     };
     document.body.append(script);
+    console.log(script, script.src);
   }
   private getXHR(): XMLHttpRequest {
     return this.pool.shift() || new XMLHttpRequest();
