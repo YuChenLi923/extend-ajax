@@ -9,7 +9,8 @@
     "dev": "webpack-cli serve --config ./build/webpack.dev.config.js",
     "lint": "eslint src",
     "build": "webpack --config ./build/webpack.prod.config.js",
-    "test": "cross-env NODE_ENV=TEST mocha -R mocha-lcov-reporter | coveralls"
+    "test": "cross-env NODE_ENV=TEST mocha",
+    "coverage-test-report": "cross-env NODE_ENV=TEST mocha -R mocha-lcov-reporter | coveralls"
   },
   "author": "YuChenLi923<liyc_code@163.com>",
   "license": "MIT",

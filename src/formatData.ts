@@ -1,4 +1,5 @@
 import isObject from 'lodash/isObject';
+import { CONTENT_TYPE_MAP } from './const';
 
 const formatMethods: Record<string, (data: any) => string | FormData> = {
   'application/json': function (data: any): string {
@@ -53,6 +54,9 @@ function formatData(
 ): string | FormData {
   if (method === 'get') {
     contentType = 'text/plain';
+  }
+  if (CONTENT_TYPE_MAP[contentType]) {
+    contentType = CONTENT_TYPE_MAP[contentType];
   }
   if (formatMethods[contentType]) {
     return formatMethods[contentType](data);

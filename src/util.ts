@@ -8,6 +8,7 @@ export function toLargeCamel(str:string):string {
   if (!/^\w+(-\w+)+/.test(str)) {
     return str;
   }
+
   const fragment:string[] = str.split('-');
   fragment.forEach((item, index) => {
     fragment[index] = item.replace(/^\w/, function (char) {

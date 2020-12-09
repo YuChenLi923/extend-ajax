@@ -40,16 +40,16 @@ class ExtendAjax {
       options = configs[1];
       this.method = configs[0] as HTTP_METHOD;
     }
-    if (this.options.header) {
-      setKeyToLargeCamel(this.options.header);
-      toStandardHeader(this.options.header);
-    }
     this.url = url;
     this.xhr = this.method === 'jsonp' ? null : this.getXHR();
     this.options = {
       ...ExtendAjax.options,
       ...options
     };
+    if (this.options.header) {
+      setKeyToLargeCamel(this.options.header);
+      toStandardHeader(this.options.header);
+    }
   }
   private verifyCache(cache: AjaxCache, key:string) {
     if (cache && ExtendAjax.options.cacheSize &&
@@ -62,6 +62,7 @@ class ExtendAjax {
     } else if (!cache || ExtendAjax.options.cacheSize === 0) {
      return false;
     }
+
     return true;
   }
   private addXHREventListener (xhr:XMLHttpRequest, that: any) {
@@ -222,6 +223,7 @@ class ExtendAjax {
         header,
         url: this.url
       });
+
       const cacheData = ExtendAjax.cache[cacheKey];
       if (!this.verifyCache(cacheData, cacheKey)) {
         if (query) {
@@ -263,7 +265,7 @@ const ajax = function (url: string, ...configs: AjaxConfig):ExtendAjax {
   return new ExtendAjax(url, ...configs);
 }
 
-export const setConfig = function (options: AjaxOptions) {
-  ExtendAjax.options = options;
+ajax.config = function (options: AjaxOptions) {
+  Object.assign(ExtendAjax.options, options);
 }
 export default ajax;
