@@ -12,10 +12,10 @@ declare interface AjaxOptions {
   /** Asynchronous or not */
   isAsync?: boolean;
 
-  /** The size of ajax request cache. (default: 0, unit: second) */
+  /** The size of ajax request cache. (default: 0) */
   cacheSize?: number;
 
-  /** The expire time of ajax request cache. (default: 300, unit: second) */
+  /** The expire time of ajax request cache. (default: 300, unit: ms) */
   cacheExp?: number;
 
   /** The character type of the requested data */
