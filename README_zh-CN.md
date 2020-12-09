@@ -11,7 +11,7 @@
 - 能够缓存请求,如果不是jsonp传输的话
 - 可以在使用前提前处理服务端发来的数据
 - 支持jsonp传输
-- 支持IE8+
+- 支持IE10+
 
 
 ## 安装
@@ -123,7 +123,7 @@ jsonp传输
 
 - data \<string>|\<object>  如果请求方式为get,那么data会放入查询字符串中，而不会放入请求主体中。
 
-### ajax.stop()
+### ajax.abort()
 
 中断ajax请求
 
@@ -149,3 +149,8 @@ jsonp传输
 ### ajax.config(options)
 
 设置全局配置,每一个ajax对象都会应用这个配置。
+
+
+## 兼容IE8-9
+
+请使用1.x和0.x版本。
