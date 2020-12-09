@@ -7,7 +7,6 @@ Changes.md
 test.html
 package-lock.json
 node_modules/
-build/
 test/
 src/
 
