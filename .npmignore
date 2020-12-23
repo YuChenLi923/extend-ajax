@@ -5,6 +5,7 @@ test/
 build/
 docs/
 .idea/
+src/
 .coveralls.yml
 .babelrc
 .eslintrc.js
