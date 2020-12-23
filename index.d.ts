@@ -1,7 +1,6 @@
 declare type HttpMethod = 'get' | 'post' | 'delete' | 'put' | 'jsonp';
 declare type CallBack = (data?: any) => void;
 declare type EventType = 'success' | 'fail' | 'start' | 'end' | 'timeout' | 'abort' | 'progress';
-declare type AjaxConfig = [method: HttpMethod, options?: AjaxOptions] | [options: AjaxOptions] | []
 declare interface HttpHeader {
   'Content-Type'?: 'text' | 'json' | 'form' | 'formData' | 'html' | string;
   Accept?: 'text' | 'json' | 'form' | string;
@@ -70,7 +69,12 @@ declare class ExtendAjax {
   static options: AjaxOptions;
   static cacheCurSize: number;
   public options: AjaxOptions;
-  constructor(url: string, ...configs: AjaxConfig);
+
+  constructor(url: string);
+  constructor(url: string, method: HttpMethod);
+  constructor(url: string, options: AjaxOptions);
+  constructor(url: string, method: HttpMethod, options: AjaxOptions);
+
   /**
   * Add a callback function for the specified event
   * @param {string} eventName - The event's name
@@ -91,13 +95,18 @@ declare class ExtendAjax {
   abort(): void;
 }
 
-/**
+
+ /**
  * Create an Ajax request object.
  * @param {string} url - The url of the request.
- * @param {AjaxConfig}  ...configs - [method, options] | [options] | []
+ * @param {string} method  The method of the request.
+ * @param {AjaxOptions} options  The options of the request.
  * @return {ExtendAjax}  Ajax request object
- */
-declare function eAjax(url: string, ...configs: AjaxConfig): ExtendAjax;
+  */
+declare function eAjax(url: string): ExtendAjax;
+declare function eAjax(url: string, method: HttpMethod): ExtendAjax;
+declare function eAjax(url: string, options: AjaxOptions): ExtendAjax;
+declare function eAjax(url: string, method: HttpMethod, options: AjaxOptions): ExtendAjax;
 
 declare namespace eAjax {
     /**

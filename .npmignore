@@ -1,7 +1,6 @@
 test/
 node_modules/
 coverage/
-test/
 build/
 docs/
 .idea/
