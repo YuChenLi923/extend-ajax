@@ -1,6 +1,6 @@
 type HTTP_METHOD = 'get' | 'post' | 'delete' | 'put' | 'jsonp';
 type CALLBACK = (data?: any) => void
-type EVENT_TYPE = 'success' | 'fail' | 'start' | 'end' | 'timeout' | 'abort' | 'progress';
+type EVENT_TYPE = 'success' | 'fail' | 'start' | 'end' | 'timeout' | 'abort' | 'progress' | 'beforeSend';
 type AjaxEvents = Record<EVENT_TYPE, CALLBACK[]>;
 interface HttpHeader {
   'Content-Type'?: 'text' | 'json' | 'form' | 'formData' | 'html' | string;
@@ -9,7 +9,7 @@ interface HttpHeader {
 }
 
 interface AjaxOptions {
-  isAsync?: boolean; // 默认:true
+  isAsync?: boolean;
   cacheSize?: number;
   cacheExp?: number;
   charset?: string;
@@ -21,7 +21,8 @@ interface AjaxOptions {
   scope?: any;
   timeout?: number | false;
   withCredentials?: boolean;
-  query?: Record<string, string | number>
+  query?: Record<string, string | number>;
+  autoAbort?: boolean;
 }
 
 interface AjaxResData {

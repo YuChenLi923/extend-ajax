@@ -117,6 +117,7 @@ create one ajax object, but it can't send a request immediately, you need use aj
   - scope \<object> default null, define the scope of callback function.
   - timeout \<number> the number of milliseconds a request can take before automatically being terminated
   - withCredentials \<Boolean> default: false, whether or not cross-site Access-Control requests should be made using credentials such as cookies, authorization headers or TLS client certificates
+  - autoAbort \<Boolean> default: false, Whether to abort requests where from the previousroute page when the page url changed and does not refresh(For single page application).
 
 ### ajax.send(data)
 

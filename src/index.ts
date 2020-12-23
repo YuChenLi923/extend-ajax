@@ -9,6 +9,8 @@ import {
 } from './util';
 import { DEFAULT_OPTIONS } from './const';
 import formatData from './formatData';
+import handleAutoAbort from './handleAutoAbort';
+
 const win = window as Record<string, any>;
 class ExtendAjax {
   static options: AjaxOptions = DEFAULT_OPTIONS;
@@ -65,7 +67,7 @@ class ExtendAjax {
 
     return true;
   }
-  private addXHREventListener (xhr:XMLHttpRequest, that: any) {
+  private addXHREventListener (xhr:XMLHttpRequest) {
     const {
       convert,
       timeout,
@@ -107,7 +109,7 @@ class ExtendAjax {
         ) {
           ExtendAjax.cache[hashKey] = {
             res,
-            exp: ExtendAjax.options.cacheExp * 1000,
+            exp: ExtendAjax.options.cacheExp,
             time: +new Date()
           };
           ++ExtendAjax.cacheCurSize;
@@ -131,7 +133,7 @@ class ExtendAjax {
     } = this.options;
     script.src = url;
     script.type = 'text/javascript';
-    console.log(script);
+
     if (timeout) {
       this.timer = window.setTimeout(() => {
         this.timer = script.onload = script.onerror = null;
@@ -147,7 +149,6 @@ class ExtendAjax {
       clearTimeout(this.timer as number);
     }
     script.onload = () => {
-      console.log('加载完成');
       if (!script.getAttribute('data-load')) {
         this.emit('fail');
         script.onerror = null;
@@ -162,7 +163,6 @@ class ExtendAjax {
       document.body.removeChild(script);
     };
     document.body.append(script);
-    console.log(script, script.src);
   }
   private getXHR(): XMLHttpRequest {
     return this.pool.shift() || new XMLHttpRequest();
@@ -183,7 +183,7 @@ class ExtendAjax {
       return;
     }
     events.forEach((cb) => {
-      cb.call(this.options.scope || null, data);
+      cb.apply(this.options.scope || null, data);
     });
   }
   public on(eventName: EVENT_TYPE, cb: CALLBACK):void {
@@ -203,8 +203,9 @@ class ExtendAjax {
       if (!this.xhr) {
         return;
       }
-      this.addXHREventListener(this.xhr, this);
+      this.addXHREventListener(this.xhr);
     });
+    this.emit('beforeSend', this.options);
     const {
       query,
       header,
@@ -216,6 +217,7 @@ class ExtendAjax {
       host = ''
     } = this.options;
     let url = host + this.url;
+
     if (this.xhr) {
       const cacheKey = getHashKey({
         body: data,
@@ -247,7 +249,7 @@ class ExtendAjax {
     if (this.xhr) {
       this.xhr.abort();
       this.emit('abort');
-    } else { // jsonp
+    } else if (this.method === 'jsonp') { // jsonp
       const { jsonpName } = this.options;
       if (jsonpName && win[jsonpName]) {
         win[jsonpName] = null;
@@ -262,10 +264,18 @@ class ExtendAjax {
 }
 
 const ajax = function (url: string, ...configs: AjaxConfig):ExtendAjax {
-  return new ExtendAjax(url, ...configs);
+  const _ajax = new ExtendAjax(url, ...configs);
+  _ajax.on('beforeSend', function (options: AjaxOptions) {
+    if (!options.autoAbort) {
+      return;
+    }
+    handleAutoAbort(_ajax);
+  });
+  return _ajax;
 }
 
 ajax.config = function (options: AjaxOptions) {
   Object.assign(ExtendAjax.options, options);
 }
 export default ajax;
+export type { ExtendAjax };

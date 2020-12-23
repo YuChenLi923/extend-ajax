@@ -1,7 +1,7 @@
-declare type HTTP_METHOD = 'get' | 'post' | 'delete' | 'put' | 'jsonp';
-declare type CALLBACK = (data?: any) => void;
-declare type EVENT_TYPE = 'success' | 'fail' | 'start' | 'end' | 'timeout' | 'abort' | 'progress';
-declare type AjaxConfig = [method: HTTP_METHOD, options?: AjaxOptions] | [options: AjaxOptions] | []
+declare type HttpMethod = 'get' | 'post' | 'delete' | 'put' | 'jsonp';
+declare type CallBack = (data?: any) => void;
+declare type EventType = 'success' | 'fail' | 'start' | 'end' | 'timeout' | 'abort' | 'progress';
+declare type AjaxConfig = [method: HttpMethod, options?: AjaxOptions] | [options: AjaxOptions] | []
 declare interface HttpHeader {
   'Content-Type'?: 'text' | 'json' | 'form' | 'formData' | 'html' | string;
   Accept?: 'text' | 'json' | 'form' | string;
@@ -15,7 +15,7 @@ declare interface AjaxOptions {
   /** The size of ajax request cache. (default: 0) */
   cacheSize?: number;
 
-  /** The expire time of ajax request cache. (default: 300, unit: ms) */
+  /** The expire time of ajax request cache. (default: 300000, unit: ms) */
   cacheExp?: number;
 
   /** The character type of the requested data */
@@ -39,7 +39,7 @@ declare interface AjaxOptions {
   /** The scope of callback function. */
   scope?: any;
 
-  /** The timeout of the request. */
+  /** The timeout of the request. (unit: ms) */
   timeout?: number | false;
 
   /** Whether to use credentials or not. */
@@ -47,6 +47,9 @@ declare interface AjaxOptions {
 
   /** The query data of the request. */
   query?: Record<string, string | number>
+
+  /** Whether to abort requests when the page url changed and does not refresh(For single page application, default: false)*/
+  autoAbort?: boolean;
 }
 
 interface AjaxResData {
@@ -73,7 +76,7 @@ declare class ExtendAjax {
   * @param {string} eventName - The event's name
   * @param {function} callback - The callback function
   */
-  on(eventName: EVENT_TYPE, cb: CALLBACK): void;
+  on(eventName: EventType, cb: CallBack): void;
 
   /**
   * Add a callback function for the specified event
@@ -81,6 +84,11 @@ declare class ExtendAjax {
   * @return {Promise} The promise of response data
   */
   send(data?: string | Record<string, unknown> | null): Promise<AjaxResData>;
+
+   /**
+  * Abort the request
+  */
+  abort(): void;
 }
 
 /**
@@ -89,15 +97,22 @@ declare class ExtendAjax {
  * @param {AjaxConfig}  ...configs - [method, options] | [options] | []
  * @return {ExtendAjax}  Ajax request object
  */
-declare function ejax(url: string, ...configs: AjaxConfig): ExtendAjax;
+declare function eAjax(url: string, ...configs: AjaxConfig): ExtendAjax;
 
-declare namespace ejax {
+declare namespace eAjax {
     /**
    * Create an Ajax request object.
    * @param {AjaxOptions} AjaxOptions - The global config.
    */
   export function config(options: AjaxOptions): void;
+  export {
+    HttpHeader,
+    EventType,
+    HttpMethod,
+    AjaxOptions,
+    ExtendAjax
+  }
 }
 
-export as namespace ejax;
-export = ejax;
+export as namespace eAjax;
+export = eAjax;

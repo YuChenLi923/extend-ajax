@@ -115,7 +115,7 @@ jsonp传输
   - scope \<object> 默认:null, 定义回调函数的作用域。
   - timeout \<number> 请求超时的响应时间,单位:ms.默认值:0,0的情况下不会触发响应超时事件
   - withCredentials \<boolean> 是否允许ajax请求携带验证信息,例如:cookie.
-
+  - autoAbort \<Boolean> default: false, 当页面路由异步更新时会主动中断上一个路由中的请求，通常应用于SPA应用中。
 
 ### ajax.send(data)
 

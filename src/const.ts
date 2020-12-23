@@ -30,7 +30,9 @@ export const DEFAULT_OPTIONS: AjaxOptions = {
   charset: 'utf-8',
   host: '',
   cacheSize: 0,
-  cacheExp: 300,
+  cacheExp: 300000,
   jsonpName: 'jsonpCallback',
-  jsonpParam: 'callback'
+  jsonpParam: 'callback',
+  autoAbort: false
 };
+
