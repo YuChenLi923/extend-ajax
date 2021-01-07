@@ -35,4 +35,9 @@ module.exports = function (app) {
     res.write(`${+new Date()}`);
     res.end();
   });
+  app.get('/testQuery', (req, res) => {
+    console.log(req.query);
+    res.json(req.query);
+    res.end();
+  });
 }

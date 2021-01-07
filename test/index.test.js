@@ -119,4 +119,20 @@ describe('extend-ajax test cases:', () => {
     });
     req1.send();
   });
+  it('send request with query', () => {
+    return ajax('/testQuery', 'get', {
+      convert: function (data) {
+        return JSON.parse(data);
+      },
+      query: {
+        title: '2',
+        id: '2'
+      }
+    }).send({
+      title: '1'
+    }).then((res) => {
+      should(res.data.title).equal('1');
+      should(res.data.id).equal('2');
+    });
+  });
 });

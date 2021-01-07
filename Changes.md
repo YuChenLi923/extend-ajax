@@ -1,8 +1,11 @@
 # Changes
 
+# 2.1.1
+
+- Add(Ajax.send): Add a support for send data when the method of request is `get`.
 
 # 2.1.0
-- Add (AjaxOptions): autoAbort.
+- Add(AjaxOptions): autoAbort.
 - Add(index.d.ts): HttpMethod, EventType, HttpHeader, AjaxOptions, ExtendAjax exports
 
 # 2.0.1

@@ -195,7 +195,7 @@ class ExtendAjax {
     }
     return;
   }
-  public async send(data?: string | Record<string, unknown> | null): Promise<AjaxResData> {
+  public async send(data?: string | Record<string, any> | null): Promise<AjaxResData> {
     this.data = data;
     this.promise = new Promise((resolve, reject) => {
       this.resolve = resolve;
@@ -207,7 +207,6 @@ class ExtendAjax {
     });
     this.emit('beforeSend', this.options);
     const {
-      query,
       header,
       withCredentials,
       isAsync = true,
@@ -217,6 +216,7 @@ class ExtendAjax {
       host = ''
     } = this.options;
     let url = host + this.url;
+    let query = this.options.query;
 
     if (this.xhr) {
       const cacheKey = getHashKey({
@@ -225,6 +225,13 @@ class ExtendAjax {
         header,
         url: this.url
       });
+
+      if (this.method === 'get' && typeof data === 'object') {
+        query = {
+          ...query,
+          ...data
+        };
+      }
 
       const cacheData = ExtendAjax.cache[cacheKey];
       if (!this.verifyCache(cacheData, cacheKey)) {
