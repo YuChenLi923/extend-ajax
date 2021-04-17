@@ -27,13 +27,16 @@ const formatMethods: Record<string, (data: any) => string | FormData> = {
     return temp.substring(1);
   },
   'formData': function (data: any): FormData {
+    if (data instanceof FormData) {
+      return data;
+    }
     const temp = new FormData();
     if (!isObject(data)) {
       return temp;
     }
     for (const key in data) {
       const val: any = data[key as keyof typeof data];
-      if (val instanceof FileList) {
+      if (val instanceof FileList || Array.isArray(val)) {
         for(let i = 0; i < val.length; i++) {
           temp.append(key, val[i]);
         }
