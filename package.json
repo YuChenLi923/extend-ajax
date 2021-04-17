@@ -1,6 +1,6 @@
 {
   "name": "extend-ajax",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "an AJAX request library",
   "main": "dist/extend-ajax.js",
   "types": "index.d.ts",
