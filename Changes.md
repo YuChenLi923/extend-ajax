@@ -1,5 +1,13 @@
 # Changes
 
+# 2.1.3
+
+- fix(index.d.ts): HttpMethod don't support the `Patch` method.
+
+# 2.1.2
+
+- fix(formatData): formData handle error
+
 # 2.1.1
 
 - Add(Ajax.send): Add a support for send data when the method of request is `get`.

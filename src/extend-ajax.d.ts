@@ -1,4 +1,4 @@
-type HTTP_METHOD = 'get' | 'post' | 'delete' | 'put' | 'jsonp';
+type HTTP_METHOD = 'get' | 'post' | 'delete' | 'put' | 'patch' | 'jsonp';
 type CALLBACK = (data?: any) => void
 type EVENT_TYPE = 'success' | 'fail' | 'start' | 'end' | 'timeout' | 'abort' | 'progress' | 'beforeSend';
 type AjaxEvents = Record<EVENT_TYPE, CALLBACK[]>;

@@ -1,4 +1,4 @@
-declare type HttpMethod = 'get' | 'post' | 'delete' | 'put' | 'jsonp';
+declare type HttpMethod = 'get' | 'post' | 'delete' | 'put' | 'patch' | 'jsonp';
 declare type CallBack = (data?: any) => void;
 declare type EventType = 'success' | 'fail' | 'start' | 'end' | 'timeout' | 'abort' | 'progress';
 declare interface HttpHeader {
