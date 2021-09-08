@@ -22,7 +22,7 @@ const formatMethods: Record<string, (data: any) => string | FormData> = {
       if (val === undefined) {
         continue;
       }
-      temp += `&${key}=${encodeURI(val)}`;
+      temp += `&${key}=${encodeURIComponent(val)}`;
     }
     return temp.substring(1);
   },

@@ -2,11 +2,12 @@
 
 # 2.1.3
 
-- fix(index.d.ts): HttpMethod don't support the `Patch` method.
+- Fix(AjaxOptions.query): query string format exception.(encodeURI ->  encodeURIComponent)
+- Fix(index.d.ts): HttpMethod don't support the `Patch` method.
 
 # 2.1.2
 
-- fix(formatData): formData handle error
+- Fix(formatData): formData handle error.
 
 # 2.1.1
 
